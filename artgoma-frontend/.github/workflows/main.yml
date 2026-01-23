@@ -1,0 +1,55 @@
+name: Build and Deploy Next.js with Prisma
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checkout del código fuente
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # 2. Configurar Node.js
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    # 3. Instalar OpenSSL
+    - name: Install OpenSSL
+      run: sudo apt-get update && sudo apt-get install -y openssl
+
+    # 4. Instalar dependencias
+    - name: Install dependencies
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+        GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+        NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+        MINIO_BUCKET_NAME: ${{ secrets.MINIO_BUCKET_NAME }}
+        MINIO_KEY: ${{ secrets.MINIO_KEY }}
+        MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+        MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
+      run: npm install --omit=dev
+
+    # 5. Generar archivos de Prisma
+    - name: Generate Prisma client
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: npx prisma generate
+
+    # 6. Hacer el build del proyecto
+    - name: Build the project
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: npm run build

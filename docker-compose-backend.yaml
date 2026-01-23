@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  artgoma_redis:
+    image: redis:latest
+    container_name: artgoma_redis
+    networks:
+      traefik_proxy:
+        ipv4_address: 172.28.0.26
+    restart: unless-stopped
+
+
+  createbucket-artgoma:
+    image: minio/mc:latest
+    container_name: createbucket-artgoma
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add --api s3v4 s3 http://172.28.0.5:9000 rokadmin pro@roka2024;
+      /usr/bin/mc mb s3/artgoma-storage;
+      /usr/bin/mc anonymous set download s3/artgoma-storage;
+      exit 0;
+      "
+    networks:
+      - traefik_proxy
+
+  artgoma-api:
+    build: ./artgoma-backend
+    volumes:
+      - ./artgoma-backend:/app
+    depends_on:
+      - createbucket-artgoma
+      - artgoma_redis
+    networks:
+      - traefik_proxy
+    command: ["bash","/app/server-entrypoint.sh"]
+    env_file:
+      - ./artgoma-backend/core/.env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.artgoma-api.rule=Host(`artgoma-api.myaipeople.com`)
+      - traefik.http.routers.artgoma-api.entrypoints=websecure
+      - traefik.http.routers.artgoma-api.tls.certresolver=myresolver
+      - traefik.http.routers.artgoma-api.service=artgoma-api
+      - traefik.http.services.artgoma-api.loadbalancer.server.port=8000
+    restart: unless-stopped
+
+
+  artgoma-worker:
+    container_name: artgoma-worker
+    build: ./artgoma-backend
+    depends_on:
+      - artgoma-api
+      - artgoma_redis
+    command: ["bash","/app/worker-entrypoint.sh"]
+    networks:
+      traefik_proxy:
+         ipv4_address: 172.28.0.25
+    volumes:
+      - ./artgoma-backend:/app
+    env_file:
+      - ./artgoma-backend/core/.env
+    restart: unless-stopped
+
+
+networks:
+  traefik_proxy:
+    external: true
