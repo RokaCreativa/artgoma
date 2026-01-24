@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "prisma-generate",
+      "command": "npx",
+      "args": ["prisma", "generate"],
+      "presentation": {
+        "reveal": "silent"
+      }
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "images": [
+    {
+      "url": "/bannerImage5.avif",
+      "alt": "image 5",
+      "key": "image 5",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "url": "/imagebanner2.webp",
+      "alt": "image 2",
+      "key": "image 2",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "url": "/bannerImage3.avif",
+      "alt": "image 3",
+      "key": "image 3",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "url": "/bannerImage1.avif",
+      "alt": "image 1",
+      "key": "image 1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "url": "/bannerImage4.avif",
+      "alt": "image 4",
+      "key": "image 4",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "url": "/bannerImage6.avif",
+      "alt": "image 6",
+      "key": "image 6",
+      "width": 1920,
+      "height": 1080
+    }
+  ]
+}
