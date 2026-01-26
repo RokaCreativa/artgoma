@@ -1,6 +1,9 @@
 import ArtworksList from "./components/ArtworksList";
 import SearchByTitle from "./components/SearchByTitle";
 
+// Forzar renderizado dinámico - la API externa puede fallar en build time
+export const dynamic = "force-dynamic";
+
 export default function EcommercePage({
   searchParams,
 }: {
