@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -83,10 +81,12 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--border);
   }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
   }
 }
 
@@ -97,17 +97,20 @@
   --slide-spacing: 1rem;
   --slide-size: 20%;
 }
+
 .embla__container {
   backface-visibility: hidden;
   display: flex;
   touch-action: pan-y pinch-zoom;
   margin-left: calc(var(--slide-spacing) * -1);
 }
+
 .embla__slide {
   flex: 0 0 var(--slide-size);
   min-width: 0;
   padding-left: var(--slide-spacing);
 }
+
 .embla__slide__img {
   border-radius: 1.8rem;
   display: block;
@@ -122,6 +125,7 @@
   gap: 0.6rem;
   align-items: center;
 }
+
 .embla__button {
   -webkit-tap-highlight-color: rgba(var(--text-high-contrast-rgb-value), 0.5);
   -webkit-appearance: none;
@@ -144,9 +148,11 @@
   align-items: center;
   justify-content: center;
 }
+
 .embla__button:disabled {
   color: var(--detail-high-contrast);
 }
+
 .embla__parallax {
   border-radius: 1.8rem;
   height: 100%;
@@ -157,6 +163,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -165,13 +172,16 @@
 #box {
   animation: animate 4s infinite;
 }
+
 @keyframes animate {
   0% {
     transform: translatey(-20px);
   }
+
   50% {
     transform: translatey(0px);
   }
+
   100% {
     transform: translatey(-20px);
   }
@@ -204,18 +214,21 @@
     column-gap: 1.5rem;
     column-count: 1;
   }
+
   @media (min-width: 640px) {
     .masonry-sm {
       column-gap: 1.5rem;
       column-count: 3;
     }
   }
+
   @media (min-width: 768px) {
     .masonry-md {
       column-gap: 1.5rem;
       column-count: 4;
     }
   }
+
   .break-inside {
     break-inside: avoid;
   }

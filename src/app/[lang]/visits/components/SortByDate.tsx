@@ -1,4 +1,4 @@
-import { IVisits } from "@/queries/getVisits";
+import { IVisit } from "@/queries/getVisits";
 import { ArrowDown10, ArrowUp01 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -7,13 +7,13 @@ const SortByDate = ({
   filteredData,
   results,
 }: {
-  setFilteredData: React.Dispatch<IVisits[]>;
-  filteredData: IVisits[];
-  results: IVisits[];
+  setFilteredData: React.Dispatch<IVisit[]>;
+  filteredData: IVisit[];
+  results: IVisit[];
 }) => {
   const [sortOrder, setSortOrder] = useState("desc");
 
-  const sortDataByDate = (data: IVisits[], order: string) => {
+  const sortDataByDate = (data: IVisit[], order: string) => {
     return data.sort((a, b) => {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);

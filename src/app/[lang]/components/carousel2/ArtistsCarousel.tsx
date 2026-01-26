@@ -16,9 +16,18 @@ const ArtistsCarousel = () => {
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {imagesArtists.map((img) => (
-            <div className="flex-none w-5/12 md:w-1/6 lg:w-1/5 px-4 mb-4" key={img.key}>
+            <div
+              className="flex-none w-5/12 md:w-1/6 lg:w-1/5 px-4 mb-4"
+              key={img.key}
+            >
               <div className="relative rounded-xl overflow-hidden group">
-                <Image className="rounded-xl" width={img.width} height={img.height} src={img.url} alt={img.alt} />
+                <Image
+                  className="rounded-xl"
+                  width={img.width}
+                  height={img.height}
+                  src={img.url}
+                  alt={img.alt}
+                />
                 <p className="absolute bottom-1 md:bottom-4 right-0 left-0 z-20 text-white text-center opacity-0 group-hover:opacity-100 duration-300 text-xs md:text-base font-light">
                   {img.artistName}
                 </p>

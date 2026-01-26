@@ -1,35 +1,12 @@
-import Image from "next/image";
-import React from "react";
-import { useCarouselBrands } from "./useCarouselBrands";
+// 🧭 MIGA DE PAN: Carousel Index - Re-export del LogoCarousel
+// 📍 UBICACIÓN: src/app/[lang]/components/carousel/index.tsx
+//
+// 🎯 PORQUÉ EXISTE: Mantener compatibilidad con imports existentes
+// 🔄 FLUJO: import LogoCarousel from "@/components/carousel" funciona
+//
+// 📋 SPEC: SPEC-26-01-2026-CMS-ContentManager (Tarea 1.9)
 
-const LogoCarousel = () => {
-  const carouselBrands = useCarouselBrands();
-
-  return (
-    <section className="bg-[#1c1f24] w-full inline-flex flex-nowrap overflow-x-hidden pb-8 lg:h-64">
-      <ul className="flex items-center space-x-4 lg:space-x-16 animate-loop-scroll px-0 lg:px-8 [&_li]:mx-4 [&_img]:max-w-none">
-        {carouselBrands.map((item, i) => {
-          return (
-            <li key={i}>
-              <Image src={item.imageUrl} alt={item.alt} width={item.width} height={item.height} />
-            </li>
-          );
-        })}
-      </ul>
-      <ul
-        className="flex items-center space-x-4 lg:space-x-16 animate-loop-scroll px-0 lg:px-8 [&_li]:mx-4 [&_img]:max-w-none"
-        aria-hidden="true"
-      >
-        {carouselBrands.map((item, i) => {
-          return (
-            <li key={i}>
-              <Image src={item.imageUrl} alt={item.alt} width={item.width} height={item.height} />
-            </li>
-          );
-        })}
-      </ul>
-    </section>
-  );
-};
-
-export default LogoCarousel;
+export { default } from "./LogoCarousel";
+export { default as LogoCarousel } from "./LogoCarousel";
+export { default as LogoCarouselClient } from "./LogoCarouselClient";
+export type { BrandItem } from "./LogoCarousel";

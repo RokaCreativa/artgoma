@@ -5,9 +5,9 @@ export default function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: {
+  params: Promise<{
     lang: string;
-  };
+  }>;
 }>) {
   return (
     <div className="relative overflow-hidden bg-[#1c1f24] h-screen w-screen">

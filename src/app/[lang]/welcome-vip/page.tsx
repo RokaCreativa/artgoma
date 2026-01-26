@@ -9,7 +9,8 @@ import MoreAboutLink from "./components/MoreAboutLink";
 import BlackBox from "./components/BlackBox";
 import DialogConfirm from "../components/dialog-confirm";
 
-const WelcomePage = async ({ params: { lang } }: { params: { lang: Locale } }) => {
+const WelcomePage = async ({ params }: { params: Promise<{ lang: Locale }> }) => {
+  const { lang } = await params;
   const { welcomePage } = await getDictionary(lang);
 
   return (

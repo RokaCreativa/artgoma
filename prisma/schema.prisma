@@ -9,110 +9,166 @@ datasource db {
 }
 
 model Event {
-  id          Int      @id @default(autoincrement())
-  name        String
-  slug        String
-  date        DateTime
-  place       String
-  isActive    Boolean  @default(true)
-  description String?
-  images      String[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  Visits Visit[]
+  id                   Int                    @id @default(autoincrement())
+  name                 String
+  date                 DateTime
+  place                String
+  isActive             Boolean                @default(true)
+  description          String?
+  images               String[]               @default([])
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @default(now()) @updatedAt
+  slug                 String
+  color                String?                @default("#000000")
+  isPublished          Boolean                @default(false)
+  shortDescription     String                 @default("")
+  step                 Int                    @default(0)
+  thumbnail            String                 @default("")
+  expDate              DateTime               @default(now())
+  placeLink            String                 @default("")
+  secondaryColor       String?                @default("#ffffff")
+  SponsorImagesOnEvent SponsorImagesOnEvent[]
+  Visits               Visit[]
 }
 
 model User {
-  id          Int     @id @default(autoincrement())
-  name        String
-  email       String  @unique
-  password    String?
-  image       String?
-  phone       String?
-  isActive    Boolean @default(true)
-  badge       String?
-  attendances Int     @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  Visits Visit[]
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  image           String?
+  phone           String?
+  isActive        Boolean  @default(true)
+  badge           String?
+  attendances     Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+  name            String
+  password        String?
+  purchasesAmount Float    @default(0)
+  purchasesCount  Int      @default(0)
+  role            String?  @default("user")
+  Visits          Visit[]
 }
 
 model Visit {
-  id             Int      @id @default(autoincrement())
+  id             Int           @id @default(autoincrement())
   eventId        Int?
   userId         Int
-  companions     String
   date           DateTime
-  isCanceled     Boolean  @default(false)
   collaboratorId Int?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  Event        Event?        @relation(fields: [eventId], references: [id])
-  User         User          @relation(fields: [userId], references: [id])
-  Collaborator Collaborator? @relation(fields: [collaboratorId], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now()) @updatedAt
+  companions     String
+  isCanceled     Boolean       @default(false)
+  isUsed         Boolean       @default(false)
+  Collaborator   Collaborator? @relation(fields: [collaboratorId], references: [id])
+  Event          Event?        @relation(fields: [eventId], references: [id])
+  User           User          @relation(fields: [userId], references: [id])
 }
 
 model Collaborator {
-  id       Int     @id @default(autoincrement())
-  name     String
-  slogan   String?
-  slug     String? @unique
-  code     String  @unique
-  image    String?
-  email    String  @unique
-  
-  // Arreglo temporal para permitir nulos mientras migramos (si falla)
-  phone    String?
-  address  String?
-  isActive Boolean @default(true)
-  company  String
-
+  id        Int      @id @default(autoincrement())
+  name      String
+  slogan    String?
+  slug      String?  @unique
+  code      String   @unique
+  image     String?
+  email     String   @unique
+  phone     String?
+  address   String?
+  isActive  Boolean  @default(true)
+  company   String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
+  Visits    Visit[]
+}
 
-  Visits Visit[]
+model Sponsor {
+  id           Int            @id @default(autoincrement())
+  name         String
+  email        String?
+  phone        String?
+  address      String?
+  company      String?
+  slogan       String?
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now())
+  SponsorImage SponsorImage[]
+}
+
+model SponsorImage {
+  id                   Int                    @id @default(autoincrement())
+  sponsorId            Int
+  image                String
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @default(now())
+  Sponsor              Sponsor                @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  SponsorImagesOnEvent SponsorImagesOnEvent[]
+}
+
+model SponsorImagesOnEvent {
+  id             Int          @id @default(autoincrement())
+  sponsorImageId Int
+  eventId        Int
+  Event          Event        @relation(fields: [eventId], references: [id])
+  SponsorImage   SponsorImage @relation(fields: [sponsorImageId], references: [id], onDelete: Cascade)
 }
 
 // -------------------------------------------------------------
-//  GALERÍA DE ARTE (NUEVOS MODELOS PARA INTEGRACIÓN UNIFICADA)
+//  CMS - CONTENT MANAGEMENT SYSTEM
+//  SPEC: SPEC-26-01-2026-CMS-ContentManager
 // -------------------------------------------------------------
 
-model Artwork {
-  id          Int      @id @default(autoincrement())
-  title       String
-  artist_name String?  // Nombre denormalizado para búsquedas rápidas
-  
-  width       Float?
-  height      Float?
-  depth       Float?
-  
-  price       Float?
-  year        Int?
-  image       String?  // URL de la imagen (Supabase)
-  
-  genreId     Int?
-  techniqueId Int?
-  
-  createdAt   DateTime @default(now())
-  
-  Genre       Genre?     @relation(fields: [genreId], references: [id])
-  Technique   Technique? @relation(fields: [techniqueId], references: [id])
+model Slider {
+  id          Int          @id @default(autoincrement())
+  name        String
+  slug        String       @unique
+  section     String
+  description String?
+  isActive    Boolean      @default(true)
+  position    Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
+  items       SliderItem[]
 }
 
-model Genre {
-  id       Int       @id @default(autoincrement())
-  name     String
-  Artworks Artwork[]
+model SliderItem {
+  id         Int      @id @default(autoincrement())
+  sliderId   Int
+  type       String   @default("image")
+  url        String?
+  youtubeId  String?
+  title      String?
+  alt        String?
+  artistName String?
+  width      Int?
+  height     Int?
+  position   Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+  Slider     Slider   @relation(fields: [sliderId], references: [id], onDelete: Cascade)
 }
 
-model Technique {
-  id       Int       @id @default(autoincrement())
-  name     String
-  Artworks Artwork[]
+model SectionContent {
+  id         Int      @id @default(autoincrement())
+  sectionKey String
+  locale     String
+  content    Json
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@unique([sectionKey, locale])
+}
+
+model SiteConfig {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  type      String   @default("text")
+  group     String   @default("general")
+  label     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }

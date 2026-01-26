@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 import FormConfirmWithoutAuth from "./FormConfirmWithoutAuth";
 import { cookies } from "next/headers";
 
-const DialogFormConfirm = ({ lang, eventId }: { lang: string; eventId?: number }) => {
-  const cookieStore = cookies();
+const DialogFormConfirm = async ({ lang, eventId }: { lang: string; eventId?: number }) => {
+  const cookieStore = await cookies();
   const collaborator = cookieStore.get("collaborator");
   const code = collaborator?.name === "collaborator" ? collaborator.value : null;
 

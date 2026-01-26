@@ -12,7 +12,8 @@ import LogoCarousel from "./components/carousel";
 import ArtistsCarousel from "./components/carousel2/ArtistsCarousel";
 import GoldenTicketsCarousel from "./components/carousel-tickets";
 
-const Home = ({ params: { lang } }: { params: { lang: Locale } }) => {
+const Home = async ({ params }: { params: Promise<{ lang: Locale }> }) => {
+  const { lang } = await params;
   return (
     <main className="overflow-x-hidden">
       <Hero lang={lang} />

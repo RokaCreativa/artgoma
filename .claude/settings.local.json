@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__nexus__nexus_workspace_current",
+      "mcp__nexus__nexus_workspace_switch"
+    ]
+  }
+}

@@ -8,8 +8,9 @@ import { Locale } from "@/configs/i18n.config";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
-export default async function EventsPage({ params: { lang } }: { params: { lang: Locale } }) {
+export default async function EventsPage({ params }: { params: Promise<{ lang: Locale }> }) {
   noStore();
+  const { lang } = await params;
   const events = await getActiveEvents();
 
   return (

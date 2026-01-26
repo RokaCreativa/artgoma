@@ -11,8 +11,9 @@ import { redirect } from "next/navigation";
 import Circle from "../components/circle";
 import FormConfirm from "./components/FormConfirm";
 
-const ConfirmPage = async ({ params: { lang } }: { params: { lang: Locale } }) => {
-  const cookieStore = cookies();
+const ConfirmPage = async ({ params }: { params: Promise<{ lang: Locale }> }) => {
+  const { lang } = await params;
+  const cookieStore = await cookies();
   const collaborator = cookieStore.get("collaborator");
 
   const session = await getServerSession(authOptions);

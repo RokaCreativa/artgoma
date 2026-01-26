@@ -10,7 +10,8 @@ import { IVisit, ResultVisit } from "@/queries/getVisits";
 import Visit from "./Visit";
 
 const Visits = ({ visits }: { visits: ResultVisit }) => {
-  const params: { date: string } = useParams();
+  const params = useParams<{ date: string; lang: string }>();
+  const lang = params.lang;
   const results: IVisit[] = visits.visits;
   const [filteredData, setFilteredData] = useState<IVisit[]>(results);
 
@@ -25,11 +26,18 @@ const Visits = ({ visits }: { visits: ResultVisit }) => {
         <FilterByDate />
 
         {params.date ? (
-          <Link className="border border-black rounded-md px-1" href={"/visits"}>
+          <Link
+            className="border border-black rounded-md px-1"
+            href={`/${lang}/visits`}
+          >
             show all
           </Link>
         ) : (
-          <SortByDate filteredData={filteredData} setFilteredData={setFilteredData} results={results} />
+          <SortByDate
+            filteredData={filteredData}
+            setFilteredData={setFilteredData}
+            results={results}
+          />
         )}
       </div>
 

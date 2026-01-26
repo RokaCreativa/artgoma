@@ -2,7 +2,8 @@ import { getVisits } from "@/queries/getVisits";
 import Visits from "../components/Visits";
 import { Locale } from "@/configs/i18n.config";
 
-const visits = async ({ params: { date } }: { params: { lang: Locale; date: string } }) => {
+const visits = async ({ params }: { params: Promise<{ lang: Locale; date: string }> }) => {
+  const { date } = await params;
   const visits = await getVisits(date);
 
   return (

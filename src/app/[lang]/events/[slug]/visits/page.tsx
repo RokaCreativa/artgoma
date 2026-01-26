@@ -3,7 +3,8 @@ import { getVisitsBySlug } from "@/queries/getVisitsBySlug";
 import { BadgeCheck, CalendarCheckIcon, Mail, PhoneIcon, Users } from "lucide-react";
 import React from "react";
 
-const VisitsByEventPage = async ({ params: { slug, lang } }: { params: { lang: string; slug: string } }) => {
+const VisitsByEventPage = async ({ params }: { params: Promise<{ lang: string; slug: string }> }) => {
+  const { slug, lang } = await params;
   const { visits } = await getVisitsBySlug(slug);
 
   if (!visits) {

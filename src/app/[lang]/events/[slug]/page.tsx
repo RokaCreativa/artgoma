@@ -7,7 +7,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import FormConfirmOnEvents from "../components/FormConfirmOnEvents";
 
-const EventPage = async ({ params: { slug, lang } }: { params: { lang: Locale; slug: string } }) => {
+const EventPage = async ({ params }: { params: Promise<{ lang: Locale; slug: string }> }) => {
+  const { slug, lang } = await params;
   const event = await getEventBySlug({ slug });
   const session = await getServerSession(authOptions);
 

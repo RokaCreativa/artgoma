@@ -1,37 +1,89 @@
+// 🧭 MIGA DE PAN: EmblaCarousel2 - Embla carousel para videos con soporte YouTube
+// 📍 UBICACIÓN: src/app/[lang]/components/sections/carousel2/EmblaCarousel2.tsx
+//
+// 🎯 PORQUÉ EXISTE: Carousel horizontal de videos con botones prev/next
+// 🎯 CASOS DE USO: Videos de stories/historias - MP4 o YouTube
+//
+// 🔄 FLUJO: slides[] → map → Video o YouTubeEmbed según type
+// 🔗 USADO EN: Carousel2.tsx
+// ⚠️ DEPENDENCIAS: embla-carousel-react, Video.tsx, YouTubeEmbed.tsx
+//
+// 🚨 CUIDADO: El type determina si es video MP4 o YouTube embed
+// 📋 SPEC: SPEC-26-01-2026-CMS-ContentManager (Tarea 1.9)
+
 "use client";
 
 import { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
-import { NextButton, PrevButton, usePrevNextButtons } from "./EmblaCarousel2ArrowButtons";
-import { useRef, useState } from "react";
-import { Pause, Play } from "lucide-react";
+import {
+  NextButton,
+  PrevButton,
+  usePrevNextButtons,
+} from "./EmblaCarousel2ArrowButtons";
 import Video from "./Video";
+import YouTubeEmbed from "@/app/[lang]/components/YouTubeEmbed";
+import type { CarouselVideoItem } from "./Carousel2";
 
 type PropType = {
-  slides: {
-    url: string;
-    alt: string;
-    format: string;
-    key: string;
-    width: number;
-    height: number;
-  }[];
+  slides: CarouselVideoItem[];
   options?: EmblaOptionsType;
 };
 
 const EmblaCarousel: React.FC<PropType> = (props) => {
   const { slides, options } = props;
-  const [emblaRed, emblaApi] = useEmblaCarousel(options);
+  const [emblaRef, emblaApi] = useEmblaCarousel(options);
 
-  const { prevBtnDisabled, nextBtnDisabled, onPrevButtonClick, onNextButtonClick } = usePrevNextButtons(emblaApi);
+  const {
+    prevBtnDisabled,
+    nextBtnDisabled,
+    onPrevButtonClick,
+    onNextButtonClick,
+  } = usePrevNextButtons(emblaApi);
 
   return (
     <div className="max-w-full mx-auto">
-      <div className="overflow-hidden" ref={emblaRed}>
+      <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
-          {slides.map((historie) => (
-            <Video key={historie.key} historie={historie} />
-          ))}
+          {slides.map((slide) => {
+            // Determinar si es YouTube o video MP4
+            const isYouTube =
+              slide.type === "youtube" || slide.format === "youtube";
+
+            if (isYouTube && slide.youtubeId) {
+              return (
+                <div
+                  key={slide.key}
+                  className="flex-none h-[420px] md:h-[580px] w-4/5 md:w-[45%] lg:w-[30%] px-2 md:px-4 lg:px-6 py-6"
+                >
+                  <YouTubeEmbed
+                    youtubeId={slide.youtubeId}
+                    title={slide.title || slide.alt}
+                    aspectRatio="vertical"
+                    autoplay={false}
+                    showControls={true}
+                    liteMode={true}
+                    className="h-full w-full shadow-gray-800 shadow-lg"
+                    thumbnailQuality="hqdefault"
+                  />
+                </div>
+              );
+            }
+
+            // Video MP4 (formato original)
+            return (
+              <Video
+                key={slide.key}
+                historie={{
+                  url: slide.url,
+                  alt: slide.alt,
+                  format: slide.format,
+                  key: slide.key,
+                  width: slide.width,
+                  height: slide.height,
+                }}
+              />
+            );
+          })}
         </div>
       </div>
 

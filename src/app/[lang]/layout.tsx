@@ -49,17 +49,19 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { lang: Locale };
+  params: Promise<{ lang: string }>;
 }>) {
-  const dictionary = await getDictionary(params.lang);
+  const { lang } = await params;
+  const validLang = lang as Locale;
+  const dictionary = await getDictionary(validLang);
 
   return (
-    <html className="scroll-smooth" lang={params.lang}>
+    <html className="scroll-smooth" lang={validLang}>
       <body className={montserrat.className}>
         <NextAuthProvider>
           <DictionaryProvider dictionary={dictionary}>
             <div className="hidden md:block fixed z-[190] h-16 w-3/4 right-0 backdrop-blur-sm bg-gradient-to-l from-black via-black to-transparent rounded-l-full overflow-hidden"></div>
-            <Navbar lang={params.lang} />
+            <Navbar lang={validLang} />
             {children}
             <Toaster />
           </DictionaryProvider>

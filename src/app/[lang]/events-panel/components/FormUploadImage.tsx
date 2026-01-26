@@ -3,12 +3,18 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { Check, CloudUpload, CloudUploadIcon, LoaderIcon, X } from "lucide-react";
+import {
+  Check,
+  CloudUpload,
+  CloudUploadIcon,
+  LoaderIcon,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import { useRef, useState, useTransition } from "react";
 
-// Constante local para reemplazar la importada de helpers de minio si desaparece
-const MAX_FILE_SIZE_NEXTJS_ROUTE = 4 * 1024 * 1024; // 4MB default
+// Max file size for Next.js API routes (Supabase Storage)
+const MAX_FILE_SIZE_NEXTJS_ROUTE = 4 * 1024 * 1024; // 4MB
 
 type PreviewFile = {
   file: File;
@@ -117,7 +123,7 @@ export function UploadFilesRoute({
         onDragOver={(e) => e.preventDefault()}
         className={cn(
           "flex flex-col items-center gap-2 w-full p-6 border-2 border-dashed rounded-lg text-center cursor-pointer hover:bg-red-500/30 transition",
-          imagesToUpload.length > 0 && "hidden"
+          imagesToUpload.length > 0 && "hidden",
         )}
       >
         <CloudUploadIcon stroke="red" />
@@ -128,7 +134,10 @@ export function UploadFilesRoute({
               : "Drag and drop files here or click to upload"}
           </span>
           <br />
-          <span className="text-xs">Upload Max file size: {MAX_FILE_SIZE_NEXTJS_ROUTE / (1024 * 1024)} MB</span>
+          <span className="text-xs">
+            Upload Max file size: {MAX_FILE_SIZE_NEXTJS_ROUTE / (1024 * 1024)}{" "}
+            MB
+          </span>
         </p>
         <input
           disabled={isPending}
@@ -146,7 +155,10 @@ export function UploadFilesRoute({
       {previewFiles.length > 0 && (
         <div className="mt-4 flex gap-3 max-w-full overflow-x-scroll overflow-hidden scrollbar pb-4">
           {previewFiles.map((preview, index) => (
-            <div key={index} className="relative flex-shrink-0 w-40 h-40 rounded-xl overflow-hidden">
+            <div
+              key={index}
+              className="relative flex-shrink-0 w-40 h-40 rounded-xl overflow-hidden"
+            >
               <Image
                 src={preview.previewUrl}
                 alt={`Preview ${index + 1}`}
@@ -170,12 +182,15 @@ export function UploadFilesRoute({
       <Button
         className="mt-3 space-x-2 max-w-fit hover:opacity-80"
         onClick={uploadToServer}
-        disabled={previewFiles.length === 0 || (imagesToUpload.length > 0 && true)}
+        disabled={
+          previewFiles.length === 0 || (imagesToUpload.length > 0 && true)
+        }
         type="button"
       >
         {isPending ? (
           <>
-            <span>Uploading</span> <LoaderIcon height={18} width={18} className="animate-spin" />
+            <span>Uploading</span>{" "}
+            <LoaderIcon height={18} width={18} className="animate-spin" />
           </>
         ) : imagesToUpload.length > 0 ? (
           <>

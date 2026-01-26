@@ -4,14 +4,15 @@ import SigningWithGoogleButton from "./components/SigningWithGoogleButton";
 import { Locale } from "@/configs/i18n.config";
 type SearchParams = { redirect: string | undefined };
 
-const RegisterPage = ({
-  params: { lang },
+const RegisterPage = async ({
+  params,
   searchParams,
 }: {
-  params: { lang: Locale };
-  searchParams?: SearchParams;
+  params: Promise<{ lang: Locale }>;
+  searchParams: Promise<SearchParams>;
 }) => {
-  const redirect = searchParams ? searchParams.redirect : null;
+  const { lang } = await params;
+  const { redirect } = await searchParams;
 
   return (
     <div className="flex flex-col items-center bg-white p-10 rounded-xl border-red-600 border">
