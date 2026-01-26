@@ -3,6 +3,7 @@
  * SPEC: SPEC-26-01-2026-CMS-ContentManager
  *
  * Migra los datos de sliders desde los JSONs hardcodeados:
+ * - imgsCarousel.json (hero banner - section: "hero")
  * - histories.json (videos carousel - section: "stories")
  * - imgs-artists.json (artistas carousel - section: "artists")
  * - slides.json (imagenes live - section: "live")
@@ -72,6 +73,16 @@ const BRANDS = [
   { url: "/brand-logo-top-art-prices.png", alt: "brand-logo-top-art-prices", width: 200, height: 200 },
 ];
 
+// Hero Carousel (imgsCarousel.json) - imagenes principales del banner
+const HERO_IMAGES = [
+  { url: "/bannerImage5.avif", alt: "image 5", width: 1920, height: 1080 },
+  { url: "/imagebanner2.webp", alt: "image 2", width: 1920, height: 1080 },
+  { url: "/bannerImage3.avif", alt: "image 3", width: 1920, height: 1080 },
+  { url: "/bannerImage1.avif", alt: "image 1", width: 1920, height: 1080 },
+  { url: "/bannerImage4.avif", alt: "image 4", width: 1920, height: 1080 },
+  { url: "/bannerImage6.avif", alt: "image 6", width: 1920, height: 1080 },
+];
+
 // ============================================
 // DEFINICION DE SLIDERS
 // ============================================
@@ -94,6 +105,20 @@ interface SliderDefinition {
 }
 
 const SLIDERS: SliderDefinition[] = [
+  {
+    name: "Hero Carousel",
+    slug: "hero-carousel",
+    section: "hero",
+    description: "Carousel principal del banner hero con imagenes de fondo",
+    items: HERO_IMAGES.map((img) => ({
+      type: "image",
+      url: img.url,
+      title: img.alt,
+      alt: img.alt,
+      width: img.width,
+      height: img.height,
+    })),
+  },
   {
     name: "Videos Historias",
     slug: "videos-stories",

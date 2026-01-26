@@ -1,7 +1,7 @@
 # WORK LOG - SPEC-26-01-2026-CMS-ContentManager
 
 > **LIFO**: Entradas nuevas ARRIBA ⬆️
-> **Última actualización**: 26/01/2026 23:30
+> **Última actualización**: 26/01/2026 23:50
 
 ---
 
@@ -9,10 +9,10 @@
 
 | Item | Estado |
 |------|--------|
-| **Fase actual** | Fase 1 COMPLETADA - Tarea 1.9 Integración Carousels |
-| **Tarea actual** | ✅ 1.9 Integración Carousels Frontend COMPLETADA |
+| **Fase actual** | Fase 1 COMPLETADA - Hero Carousel integrado |
+| **Tarea actual** | ✅ Hero Carousel con BD + fallback JSON |
 | **Bloqueadores** | Requiere `npx prisma migrate dev` para probar BD real |
-| **Próxima acción** | Ejecutar migración, seeds, y verificar rendering |
+| **Próxima acción** | Ejecutar migración, seeds, verificar Hero en browser |
 
 ---
 
@@ -25,11 +25,105 @@ FASE 3: Config         [██████████] 100% (4/4 tareas) ✅
 FASE 4: Polish         [░░░░░░░░░░] 0%
 ────────────────────────────────────
 TOTAL                  [████████░░] 85%
++ BONUS: Hero Carousel integrado ✅
 ```
 
 ---
 
 ## 📝 LOG DE TRABAJO
+
+### 26/01/2026 23:50 - HERO CAROUSEL INTEGRADO CON BD ✅
+
+**Acción**: Modificar Hero Carousel para leer de BD con fallback a JSON
+
+**Archivos creados:**
+
+1. **`src/app/[lang]/components/sections/hero/HeroCarousel.tsx`** - Server Component
+   - Llama a `getSliderBySection("hero")` para obtener imagenes de BD
+   - Transforma items de BD al formato HeroImageItem
+   - Fallback silencioso a imgsCarousel.json si BD vacia
+   - Miga de pan con referencia a SPEC
+
+2. **`src/app/[lang]/components/sections/hero/HeroCarouselClient.tsx`** - Client Component
+   - useState para currentImage
+   - useEffect con timer de 7 segundos para rotacion automatica
+   - Funcion changeImage para clicks en dots
+   - Transicion opacity 700ms entre imagenes
+   - Guard clause si images vacio
+
+**Archivos modificados:**
+
+1. **`src/app/[lang]/components/sections/hero/Hero.tsx`**
+   - Import: `Carousel` → `HeroCarousel`
+   - Uso: `<Carousel />` → `<HeroCarousel />`
+
+2. **`src/app/[lang]/components/sections/hero/index.tsx`**
+   - Agregado export de HeroCarousel
+   - Agregado export de HeroCarouselClient
+   - Agregado export de tipo HeroImageItem
+
+**Patron seguido:**
+- Igual que `sections/carousel/Carousel.tsx` (live gallery)
+- Server Component para data fetching
+- Client Component para interactividad
+- Fallback a JSON si BD vacia
+
+**Seccion BD esperada:** `"hero"` (slider con section="hero")
+
+**🔗 Spec ref**: REQ-07 (Integración Frontend), SPEC-26-01-2026-CMS-ContentManager
+**📊 Archivo Carousel.tsx original**: Mantenido como backup (puede eliminarse)
+
+---
+
+### 26/01/2026 - HERO SLIDER AGREGADO AL SEED ✅
+
+**Accion**: Agregar slider "Hero Carousel" al seed de sliders
+
+**Archivo modificado:**
+
+**`prisma/seeds/seed-sliders.ts`** - Agregado Hero slider con imagenes de banner
+
+**Cambios realizados:**
+
+1. **Nuevo array HERO_IMAGES:**
+   ```typescript
+   const HERO_IMAGES = [
+     { url: "/bannerImage5.avif", alt: "image 5", width: 1920, height: 1080 },
+     { url: "/imagebanner2.webp", alt: "image 2", width: 1920, height: 1080 },
+     { url: "/bannerImage3.avif", alt: "image 3", width: 1920, height: 1080 },
+     { url: "/bannerImage1.avif", alt: "image 1", width: 1920, height: 1080 },
+     { url: "/bannerImage4.avif", alt: "image 4", width: 1920, height: 1080 },
+     { url: "/bannerImage6.avif", alt: "image 6", width: 1920, height: 1080 },
+   ];
+   ```
+
+2. **Nuevo slider en SLIDERS[]:**
+   - name: "Hero Carousel"
+   - slug: "hero-carousel"
+   - section: "hero"
+   - description: "Carousel principal del banner hero con imagenes de fondo"
+   - items: 6 imagenes locales (type: "image", url empieza con "/")
+
+3. **Actualizado header del archivo** para documentar imgsCarousel.json
+
+**Caracteristicas:**
+- Imagenes locales (en /public, NO en Supabase)
+- Tipo: "image" (no video)
+- Dimensiones: 1920x1080 (full HD)
+- Idempotente via upsert por slug
+- Ahora son 5 sliders totales: hero, stories, artists, live, brands
+
+**Para ejecutar:**
+```bash
+npm run db:seed:sliders
+# O todo junto:
+npm run db:seed
+```
+
+**🔗 Spec ref**: REQ-01 (Sistema de Sliders)
+**📊 Progreso**: Sliders seed actualizado (5 sliders, 43 items totales)
+
+---
 
 ### 26/01/2026 23:30 - INTEGRACIÓN CAROUSELS FRONTEND COMPLETADA ✅
 

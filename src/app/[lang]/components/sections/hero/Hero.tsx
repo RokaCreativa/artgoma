@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Carousel from "./Carousel";
+import HeroCarousel from "./HeroCarousel";
 import H1hero from "./H1hero";
 import Circle from "../../circle";
 import { Locale } from "@/configs/i18n.config";
@@ -44,7 +44,7 @@ const Hero = async ({ lang }: { lang: Locale }) => {
         }
       />
 
-      <Carousel />
+      <HeroCarousel />
 
       <div className="absolute z-50 h-screen w-full flex flex-col gap-4 items-center justify-end pb-24">
         <H1hero text={home.h1} />
