@@ -49,23 +49,17 @@ const Video = ({
   }, [videoRef]);
 
   return (
-    <div className="flex-none h-[220px] md:h-[350px] w-full">
-      <div className="rounded-xl h-full overflow-hidden shadow-gray-800 shadow-lg">
-        <div className="flex justify-center items-center relative h-full w-full">
-          <video
-            ref={videoRef}
-            muted={true}
-            className="h-full w-full object-cover z-[200]"
-            controls={false}
-            loop
-            width={slide.width}
-            height={slide.height}
-          >
-            <source src={slide.url} type="video/mp4" />
-          </video>
-        </div>
-      </div>
-    </div>
+    <video
+      ref={videoRef}
+      muted={true}
+      className="h-full w-full object-cover"
+      controls={false}
+      loop
+      width={slide.width}
+      height={slide.height}
+    >
+      <source src={slide.url} type="video/mp4" />
+    </video>
   );
 };
 

@@ -73,6 +73,15 @@ const BRANDS = [
   { url: "/brand-logo-top-art-prices.png", alt: "brand-logo-top-art-prices", width: 200, height: 200 },
 ];
 
+// Golden Tickets (useCarouselGoldenTickets.js) - tarjetas VIP
+const GOLDEN_TICKETS = [
+  { url: "https://aslzzjjkccbfmmeeqbhy.supabase.co/storage/v1/object/public/events/WhatsApp%20Image%202024-07-30%20at%2011.02.12%20AM%20(1).jpeg", alt: "Golden Ticket 1", width: 180, height: 330 },
+  { url: "https://aslzzjjkccbfmmeeqbhy.supabase.co/storage/v1/object/public/events/WhatsApp%20Image%202024-07-30%20at%2011.02.12%20AM%20(2).jpeg", alt: "Golden Ticket 2", width: 180, height: 330 },
+  { url: "https://aslzzjjkccbfmmeeqbhy.supabase.co/storage/v1/object/public/events/WhatsApp%20Image%202024-07-30%20at%2011.02.12%20AM%20(3).jpeg", alt: "Golden Ticket 3", width: 180, height: 330 },
+  { url: "https://aslzzjjkccbfmmeeqbhy.supabase.co/storage/v1/object/public/events/WhatsApp%20Image%202024-07-30%20at%2011.02.12%20AM%20(4).jpeg", alt: "Golden Ticket 4", width: 180, height: 330 },
+  { url: "https://aslzzjjkccbfmmeeqbhy.supabase.co/storage/v1/object/public/events/WhatsApp%20Image%202024-07-30%20at%2011.02.12%20AM.jpeg", alt: "Golden Ticket 5", width: 180, height: 330 },
+];
+
 // Hero Carousel (imgsCarousel.json) - imagenes principales del banner
 const HERO_IMAGES = [
   { url: "/bannerImage5.avif", alt: "image 5", width: 1920, height: 1080 },
@@ -174,6 +183,20 @@ const SLIDERS: SliderDefinition[] = [
       alt: b.alt,
       width: b.width,
       height: b.height,
+    })),
+  },
+  {
+    name: "Golden Tickets",
+    slug: "golden-tickets",
+    section: "tickets",
+    description: "Tarjetas VIP e invitaciones exclusivas",
+    items: GOLDEN_TICKETS.map((t, i) => ({
+      type: "image",
+      url: t.url,
+      title: `Golden Ticket ${i + 1}`,
+      alt: t.alt,
+      width: t.width,
+      height: t.height,
     })),
   },
 ];

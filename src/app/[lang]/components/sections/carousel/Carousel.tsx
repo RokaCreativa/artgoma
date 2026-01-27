@@ -41,7 +41,11 @@ const Carousel = async () => {
 
   if (slider && slider.items && slider.items.length > 0) {
     // Transformar items de BD al formato esperado por EmblaCarousel
-    slides = slider.items.map((item, index) => ({
+    // Filtrar por isActive y ordenar por position
+    slides = slider.items
+      .filter((item) => item.isActive)
+      .sort((a, b) => a.position - b.position)
+      .map((item, index) => ({
       // video: true si es video_url o youtube
       video: item.type === "video_url" || item.type === "youtube",
       url:

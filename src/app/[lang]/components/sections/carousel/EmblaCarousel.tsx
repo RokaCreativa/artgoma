@@ -35,9 +35,9 @@ type PropType = {
 const EmblaCarousel: React.FC<PropType> = (props) => {
   const { slides, options } = props;
   const [emblaRef, emblaApi] = useEmblaCarousel(options, [
-    AutoScroll({ playOnInit: false }),
+    AutoScroll({ playOnInit: true }),
   ]);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
 
   const {
     prevBtnDisabled,
@@ -82,8 +82,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
       .on("autoScroll:play", () => setIsPlaying(true))
       .on("autoScroll:stop", () => setIsPlaying(false))
       .on("reInit", () => setIsPlaying(autoScroll.isPlaying()));
-    toggleAutoplay();
-  }, [emblaApi, toggleAutoplay]);
+  }, [emblaApi]);
 
   return (
     <div className="max-w-full mx-auto">

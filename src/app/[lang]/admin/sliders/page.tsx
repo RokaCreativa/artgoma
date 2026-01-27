@@ -21,10 +21,12 @@ type SliderWithCount = Awaited<ReturnType<typeof getSliders>>[number];
 
 // Mapeo de sección a nombre de icono (string) - FIX Next.js 16 serialization
 const sectionIconNames: Record<string, string> = {
+  hero: "layout-dashboard",
   stories: "video",
   artists: "users",
   brands: "award",
   live: "images",
+  tickets: "ticket",
   default: "images",
 };
 
