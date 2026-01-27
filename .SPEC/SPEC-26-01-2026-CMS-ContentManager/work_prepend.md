@@ -9,11 +9,12 @@
 
 | Item | Estado |
 |------|--------|
-| **Fase actual** | Fase 1 COMPLETADA - 6 sliders en BD |
-| **Tarea actual** | ✅ Upload imagenes PUSHED - commit 5908cf6 |
-| **Bloqueadores** | Ninguno |
-| **Próxima acción** | Rodolfo verificar upload en admin panel |
-| **Último commit** | 5908cf6 - feat(admin): add image upload to slider dialogs |
+| **Fase actual** | Fase 1-3 COMPLETADAS - BD producción lista |
+| **Tarea actual** | ✅ Migración BD + Seeds ejecutados |
+| **Bloqueadores** | Configurar SUPABASE_SERVICE_ROLE_KEY en Vercel |
+| **Próxima acción** | Rodolfo: Agregar variable en Vercel + Redeploy |
+| **Último commit** | 71545d6 - feat(db): diagnostic logging |
+| **BD Status** | 6 sliders, 48 items, 60 contenidos, 12 configs ✅ |
 
 ---
 
@@ -38,6 +39,60 @@ TOTAL                  [████████░░] 85%
 ---
 
 ## 📝 LOG DE TRABAJO
+
+### 27/01/2026 - MIGRACIÓN BD PRODUCCIÓN EJECUTADA ✅
+
+**Problema**: El CMS no funcionaba en producción (Vercel). Upload fallaba con RLS error, toggle no funcionaba.
+
+**Diagnóstico** (4 agentes Opus):
+1. **Schema Prisma**: Correcto ✅
+2. **Server Actions**: Correctas ✅
+3. **Admin Panel**: Correcto ✅
+4. **SPEC Analysis**: Detectó migración pendiente ⚠️
+
+**Root Cause**: `prisma migrate` nunca se ejecutó en producción. Las tablas CMS (`Slider`, `SliderItem`, `SectionContent`, `SiteConfig`) NO EXISTÍAN en Supabase.
+
+**Solución aplicada**:
+
+1. **Ejecutado `npx prisma migrate deploy`**
+   - Aplicó migraciones pendientes a BD de producción
+   - Sin errores
+
+2. **Ejecutado `npm run db:seed`**
+   - Poblado BD con seeds (config, content, sliders)
+   - Sin errores
+
+3. **Verificado BD de producción**:
+   ```
+   ✅ Sliders: 6
+   ✅ SliderItem: 48
+   ✅ SectionContent: 60
+   ✅ SiteConfig: 12
+   ```
+
+4. **Agregado diagnostic logging**:
+   - `supabase-admin.ts`: console.log verificar Service Role Key carga
+   - `src/app/api/debug-supabase/route.ts`: Endpoint temporal para debug
+
+**Commits**:
+- `71545d6` - feat(db): diagnostic logging
+
+**Pendiente CRÍTICO**:
+Rodolfo debe agregar `SUPABASE_SERVICE_ROLE_KEY` en Vercel:
+1. Vercel Dashboard → ArtGoMA → Settings → Environment Variables
+2. Add: `SUPABASE_SERVICE_ROLE_KEY` = (la misma del .env local)
+3. Redeploy
+
+**Archivos modificados**:
+- `src/lib/supabase-admin.ts` - Logging diagnóstico
+
+**Archivos creados**:
+- `src/app/api/debug-supabase/route.ts` - Endpoint temporal debug
+
+**🔗 Spec ref**: tasks.md → 1.1 (migración), 2.5 (seeds content), 3.4 (seeds config)
+**📊 Progreso**: BD producción lista para usar
+
+---
 
 ### 27/01/2026 - COMMIT Y PUSH A GITHUB ✅
 

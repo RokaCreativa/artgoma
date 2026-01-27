@@ -42,8 +42,8 @@
 - [x] Agregar modelo SliderItem (con type: youtube|image|video_url)
 - [x] Agregar modelo SectionContent
 - [x] Agregar modelo SiteConfig
-- [ ] ⚠️ Ejecutar `npx prisma migrate dev` (PENDIENTE)
-- [ ] Verificar en BD que se crearon las tablas
+- [x] ✅ Ejecutar `npx prisma migrate deploy` (27/01/2026)
+- [x] Verificar en BD que se crearon las tablas (27/01/2026 - 6 sliders, 48 items)
 
 **🔗 Spec ref**: spec.md → Arquitectura de Base de Datos
 **📊 Status**: work_prepend.md → 26/01/2026 18:30
@@ -382,8 +382,8 @@ VIDEO_ID directo ✅
 - [x] Script que lee dictionaries/*.json (es, en, de, fr, it, ru)
 - [x] Inserta en SectionContent por cada sección+locale
 - [x] Usa upsert para ser idempotente
-- [ ] Ejecutar seed (requiere migración Prisma primero)
-- [ ] Verificar datos en BD
+- [x] ✅ Ejecutar seed (27/01/2026 - npm run db:seed)
+- [x] Verificar datos en BD (27/01/2026 - 60 registros)
 
 **Secciones migradas**: home, enjoy, connect, inspire, contact, getInTouch, welcomePage, navbar, dropdown, form
 
@@ -496,7 +496,7 @@ VIDEO_ID directo ✅
 - [x] Insertar redes: facebook, instagram, youtube, twitter
 - [x] Insertar footer: copyright, year, website
 - [x] Usa upsert para ser idempotente
-- [ ] Ejecutar seed (requiere migración Prisma primero)
+- [x] ✅ Ejecutar seed (27/01/2026 - npm run db:seed)
 
 **Valores de redes extraidos del Footer.tsx**:
 - facebook: https://www.facebook.com/theartgomagallery
