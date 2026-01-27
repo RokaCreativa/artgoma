@@ -8,7 +8,7 @@
 // 📋 SPEC: SPEC-24-01-2026-001-GranMigracion2026
 
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import {
   STORAGE_BUCKETS,
   generateUniqueFileName,
@@ -91,7 +91,7 @@ export async function POST(
       const filePath = path ? `${path}/${uniqueFileName}` : uniqueFileName;
 
       // Subir a Supabase Storage
-      const { data, error } = await supabase.storage
+      const { data, error } = await supabaseAdmin.storage
         .from(bucket)
         .upload(filePath, file, {
           cacheControl: UPLOAD_CONFIG.cacheControl,
@@ -106,7 +106,7 @@ export async function POST(
       // Obtener URL publica
       const {
         data: { publicUrl },
-      } = supabase.storage.from(bucket).getPublicUrl(filePath);
+      } = supabaseAdmin.storage.from(bucket).getPublicUrl(filePath);
 
       uploadedFiles.push({
         name: file.name,

@@ -10,9 +10,10 @@
 | Item | Estado |
 |------|--------|
 | **Fase actual** | Fase 1 COMPLETADA - 6 sliders en BD |
-| **Tarea actual** | ✅ Upload de imagenes en AddItemDialog + EditItemDialog |
+| **Tarea actual** | ✅ Upload imagenes PUSHED - commit 5908cf6 |
 | **Bloqueadores** | Ninguno |
-| **Próxima acción** | Rodolfo verificar que upload funciona en admin panel |
+| **Próxima acción** | Rodolfo verificar upload en admin panel |
+| **Último commit** | 5908cf6 - feat(admin): add image upload to slider dialogs |
 
 ---
 
@@ -37,6 +38,22 @@ TOTAL                  [████████░░] 85%
 ---
 
 ## 📝 LOG DE TRABAJO
+
+### 27/01/2026 - COMMIT Y PUSH A GITHUB ✅
+
+**Commit**: `5908cf6` - feat(admin): add image upload to slider dialogs
+**Archivos**: AddItemDialog.tsx, EditItemDialog.tsx, work_prepend.md
+**Push**: `origin/main` exitoso
+
+**Resumen cambios**:
+- AddItemDialog: tabs URL/Upload con preview local
+- EditItemDialog: seccion upload con divider "o subir nueva"
+- Ambos usan `/api/upload-images` con Supabase Storage (bucket: events)
+- Validacion: PNG/JPG/WebP, max 4-5MB
+
+**Pendiente**: Rodolfo verificar que funciona en produccion
+
+---
 
 ### 27/01/2026 - UPLOAD IMAGEN EN ADDITEMDIALOG IMPLEMENTADO ✅
 
