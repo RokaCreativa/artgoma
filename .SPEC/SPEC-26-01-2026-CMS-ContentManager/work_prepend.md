@@ -1,7 +1,7 @@
 # WORK LOG - SPEC-26-01-2026-CMS-ContentManager
 
 > **LIFO**: Entradas nuevas ARRIBA ⬆️
-> **Última actualización**: 26/01/2026 23:50
+> **Última actualización**: 27/01/2026
 
 ---
 
@@ -9,10 +9,10 @@
 
 | Item | Estado |
 |------|--------|
-| **Fase actual** | Fase 1 COMPLETADA - Hero Carousel integrado |
-| **Tarea actual** | ✅ Hero Carousel con BD + fallback JSON |
-| **Bloqueadores** | Requiere `npx prisma migrate dev` para probar BD real |
-| **Próxima acción** | Ejecutar migración, seeds, verificar Hero en browser |
+| **Fase actual** | Fase 1 COMPLETADA - 6 sliders en BD |
+| **Tarea actual** | ✅ Upload de imagenes en AddItemDialog + EditItemDialog |
+| **Bloqueadores** | Ninguno |
+| **Próxima acción** | Rodolfo verificar que upload funciona en admin panel |
 
 ---
 
@@ -26,11 +26,246 @@ FASE 4: Polish         [░░░░░░░░░░] 0%
 ────────────────────────────────────
 TOTAL                  [████████░░] 85%
 + BONUS: Hero Carousel integrado ✅
++ BONUS: Golden Tickets carousel integrado ✅
++ FIX: AutoScroll "DISFRUTA EN VIVO" ✅
++ FIX: Hero slider agregado a BD ✅
++ FIX: Video.tsx alturas inconsistentes ✅
++ FIX: Upload imagenes en AddItemDialog ✅
++ FIX: Upload imagenes en EditItemDialog ✅
 ```
 
 ---
 
 ## 📝 LOG DE TRABAJO
+
+### 27/01/2026 - UPLOAD IMAGEN EN ADDITEMDIALOG IMPLEMENTADO ✅
+
+**Problema**: El dialog para AGREGAR items a sliders solo permitia pegar URLs de imagenes. Karen necesita poder subir imagenes directamente al crear nuevos items.
+
+**Solucion aplicada en** `src/app/[lang]/admin/sliders/components/AddItemDialog.tsx`:
+
+1. **Nuevo tipo `ImageMode`**: "url" | "upload"
+   - Cuando `itemType="image"`, aparecen 2 sub-opciones: "Pegar URL" o "Subir imagen"
+   - Cada opcion tiene su propia UI separada
+
+2. **Nuevos estados:**
+   - `imageMode` - Modo actual (url/upload)
+   - `selectedFile` - Archivo seleccionado antes de subir
+   - `uploadedUrl` - URL de Supabase despues de subir
+   - `isUploading` - Estado de carga
+
+3. **Nueva UI para upload:**
+   - Input file oculto + label clickeable (estilo dropzone)
+   - Preview del nombre de archivo seleccionado y tamano
+   - Validacion: solo imagenes, max 5MB
+   - Boton "Subir imagen" (azul) que llama a `/api/upload-images`
+   - Mensaje de exito con check verde cuando sube correctamente
+
+4. **Flujo de upload:**
+   ```
+   Selecciona archivo → Preview local (objectURL)
+   → Click "Subir imagen" → POST /api/upload-images (bucket: events, path: sliders)
+   → Recibe URL de Supabase → setUrl(uploadedUrl) → Preview con URL real
+   → Click "Agregar item" → Guarda con la URL de Supabase
+   ```
+
+5. **Mensajes de error mejorados:**
+   - Sin subir: "Primero sube una imagen usando el boton 'Subir imagen'"
+   - Tipo invalido: "Solo se permiten archivos de imagen"
+   - Muy grande: "El archivo no puede superar los 5MB"
+
+**Nuevos imports:**
+- `useRef` para fileInputRef
+- `Upload`, `Link as LinkIcon` de lucide-react
+
+**API usada:**
+- `POST /api/upload-images` con FormData (file, bucket="events", path="sliders")
+
+**🔗 Archivos modificados:**
+- `src/app/[lang]/admin/sliders/components/AddItemDialog.tsx`
+
+**📋 SPEC ref**: REQ-01 (Sistema de Sliders)
+**⚠️ PENDIENTE VERIFICAR**: Rodolfo debe probar que funciona el upload en el admin panel
+
+---
+
+### 27/01/2026 - UPLOAD IMAGEN EN EDITITEMDIALOG IMPLEMENTADO ✅
+
+**Problema**: El dialog para editar items de sliders solo permitía cambiar URLs. No había opción de subir una nueva imagen directamente a Supabase.
+
+**Solución aplicada en** `src/app/[lang]/admin/sliders/components/EditItemDialog.tsx`:
+
+1. **Nuevos imports:**
+   - `useRef` para el file input
+   - Iconos `Upload` y `X` de lucide-react
+
+2. **Nuevo estado para upload:**
+   - `selectedFile` - Archivo seleccionado
+   - `uploadPreview` - Preview local del archivo
+   - `isUploading` - Estado de carga
+   - `uploadError` - Mensajes de error
+   - `fileInputRef` - Referencia al input oculto
+
+3. **Nuevas funciones:**
+   - `handleFileSelect()` - Validación de archivo (tipo: PNG/JPG/WebP, tamaño: max 4MB)
+   - `clearSelectedFile()` - Limpia selección
+   - `handleUpload()` - Sube a Supabase via `/api/upload-images` (bucket: 'events')
+
+4. **Nueva UI para imágenes:**
+   - Input URL (existente, mantenido)
+   - Divider "o subir nueva"
+   - Botón con área dropzone estilizada
+   - Preview de imagen seleccionada con badge "Nueva imagen"
+   - Botones "Subir imagen" (verde) y cancelar (X)
+   - Mensajes de error de validación
+
+**Flujo de uso:**
+1. Usuario abre EditItemDialog para item tipo "image"
+2. Puede editar URL directamente O seleccionar nueva imagen
+3. Al seleccionar archivo, ve preview local
+4. Click "Subir imagen" → POST /api/upload-images
+5. Si éxito: URL se actualiza automáticamente, preview de upload desaparece
+6. Usuario puede ahora guardar cambios con nuevo URL
+
+**Características:**
+- Validación client-side de tipo y tamaño de archivo
+- Preview local instantáneo antes de subir
+- Estados visuales claros (subiendo, error)
+- No rompe funcionalidad existente de editar URL
+- Bucket 'events' de Supabase (ya existente)
+
+**🔗 Archivos modificados:**
+- `src/app/[lang]/admin/sliders/components/EditItemDialog.tsx`
+
+**📋 SPEC ref**: REQ-01 (Sistema de Sliders)
+
+---
+
+### 27/01/2026 07:45 - GOLDEN TICKETS CAROUSEL INTEGRADO ✅
+
+**Problema**: El carousel de tarjetas VIP/Golden Tickets no estaba en el admin panel de sliders.
+
+**Componente identificado**: `GoldenTicketsCarousel` en `src/app/[lang]/components/carousel-tickets/`
+
+**Solución aplicada**:
+
+1. **Nuevo slider en seed** (`prisma/seeds/seed-sliders.ts`):
+   - Array `GOLDEN_TICKETS` con 5 imágenes únicas de Supabase
+   - Slider: name="Golden Tickets", slug="golden-tickets", section="tickets"
+   - 5 items (180x330px)
+
+2. **Server Component** (`GoldenTicketsCarousel.tsx`):
+   - Llama a `getSliderBySection("tickets")`
+   - Filtra por `isActive` y ordena por `position`
+   - Fallback a `useCarouselGoldenTickets()` si BD vacía
+
+3. **Client Component** (`GoldenTicketsCarouselClient.tsx`):
+   - Recibe `tickets[]` como prop
+   - Duplica items para efecto scroll infinito
+   - CSS animation `animate-loop-scroll-right`
+
+4. **Admin panel** (`admin/sliders/page.tsx`):
+   - Agregado icono "tickets" → `ticket` en `sectionIconNames`
+
+5. **Index actualizado** (`carousel-tickets/index.tsx`):
+   - Re-export del nuevo Server Component
+
+**Estado final BD** (6 sliders):
+```
+ID:1 | Videos Historias | section: "stories" | items: 12
+ID:2 | Artistas | section: "artists" | items: 9
+ID:3 | Live Gallery | section: "live" | items: 9
+ID:4 | Sponsors y Marcas | section: "brands" | items: 5
+ID:5 | Hero Carousel | section: "hero" | items: 6
+ID:6 | Golden Tickets | section: "tickets" | items: 5  ← NUEVO
+```
+
+**🔗 Archivos creados**:
+- `src/app/[lang]/components/carousel-tickets/GoldenTicketsCarousel.tsx`
+- `src/app/[lang]/components/carousel-tickets/GoldenTicketsCarouselClient.tsx`
+
+**🔗 Archivos modificados**:
+- `prisma/seeds/seed-sliders.ts` - Añadido GOLDEN_TICKETS + slider
+- `src/app/[lang]/admin/sliders/page.tsx` - Icono "tickets"
+- `src/app/[lang]/components/carousel-tickets/index.tsx` - Re-export
+
+**📋 SPEC ref**: REQ-01 (Sistema de Sliders)
+
+---
+
+### 27/01/2026 - FIX HERO SLIDER FALTANTE EN BD ✅
+
+**Problema**: El admin panel de sliders no mostraba el slider "hero" ni "brands" (aunque brands sí estaba).
+
+**Diagnóstico**:
+1. La BD tenía 4 sliders: stories, artists, live, brands
+2. Faltaba el slider "hero" (Hero Carousel) que está definido en el seed
+3. El seed `seed-sliders.ts` no se ejecutó completamente o falló silenciosamente
+
+**Solución aplicada**:
+
+1. **Verificación BD**: Ejecuté script para verificar sliders existentes:
+   - stories (12 items) ✅
+   - artists (9 items) ✅
+   - live (9 items) ✅
+   - brands (5 items) ✅
+   - hero ❌ FALTABA
+
+2. **Agregado Hero slider** manualmente:
+   - `Hero Carousel` (slug: hero-carousel, section: hero)
+   - 6 items de imágenes banner (bannerImage1-6.avif, imagebanner2.webp)
+   - Dimensiones: 1920x1080
+
+3. **Fix admin panel** (`src/app/[lang]/admin/sliders/page.tsx`):
+   - Agregado icono "hero" al mapeo `sectionIconNames`
+   - `hero: "layout-dashboard"`
+
+**Estado final BD**:
+```
+ID:1 | Videos Historias | section: "stories" | items: 12
+ID:2 | Artistas | section: "artists" | items: 9
+ID:3 | Live Gallery | section: "live" | items: 9
+ID:4 | Sponsors y Marcas | section: "brands" | items: 5
+ID:5 | Hero Carousel | section: "hero" | items: 6  ← NUEVO
+```
+
+**🔗 Archivos modificados**:
+- `src/app/[lang]/admin/sliders/page.tsx` - Agregado icono "hero"
+
+**📋 SPEC ref**: REQ-01 (Sistema de Sliders)
+
+---
+
+### 27/01/2026 00:15 - FIX AUTOSCROLL CAROUSEL "DISFRUTA EN VIVO" ✅
+
+**Problema**: El carousel de la sección "DISFRUTA EN VIVO" no se movía automáticamente al cargar.
+
+**Diagnóstico**:
+1. `AutoScroll({ playOnInit: false })` en línea 38 - NO arrancaba automático
+2. `toggleAutoplay()` en useEffect línea 85 - Intentaba arrancar pero tenía problema de timing
+3. `isPlaying` inicializado en `false` - No reflejaba el estado real
+
+**Solución aplicada** (`src/app/[lang]/components/sections/carousel/EmblaCarousel.tsx`):
+
+1. **Línea 38**: `playOnInit: false` → `playOnInit: true`
+   - El plugin ahora arranca automáticamente al inicializar
+
+2. **Línea 40**: `useState(false)` → `useState(true)`
+   - El estado inicial refleja que el carousel arranca en play
+
+3. **Línea 85**: Removido `toggleAutoplay();` del useEffect
+   - Ya no es necesario (playOnInit: true lo hace)
+   - También eliminado `toggleAutoplay` del array de dependencias
+
+**Archivos modificados:**
+- `F:\PROYECTOS\ARTGOMA\src\app\[lang]\components\sections\carousel\EmblaCarousel.tsx`
+
+**Requiere verificación de Rodolfo**: Probar que el carousel se mueve solo al cargar la página.
+
+**🔗 Spec ref**: SPEC-26-01-2026-CMS-ContentManager (Tarea 1.9)
+**📊 Status**: Fix aplicado, pendiente verificación visual
+
+---
 
 ### 26/01/2026 23:50 - HERO CAROUSEL INTEGRADO CON BD ✅
 

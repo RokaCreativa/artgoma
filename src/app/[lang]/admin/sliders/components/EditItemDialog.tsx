@@ -1,13 +1,14 @@
 // 🧭 MIGA DE PAN: EditItemDialog - Dialog para editar un item existente
 // 📍 UBICACIÓN: src/app/[lang]/admin/sliders/components/EditItemDialog.tsx
-// 🎯 PORQUÉ EXISTE: Editar propiedades de un item (título, URL, artistName)
-// 🔄 FLUJO: Open with item → Edit fields → Save → Close
+// 🎯 PORQUÉ EXISTE: Editar propiedades de un item (título, URL, artistName) + subir imagen
+// 🔄 FLUJO: Open with item → Edit fields OR Upload image → Save → Close
 // 🚨 CUIDADO: No permite cambiar el tipo (youtube/image), solo editar datos
+// 🔗 USA: /api/upload-images para subir a Supabase Storage (bucket: events)
 // 📋 SPEC: SPEC-26-01-2026-CMS-ContentManager
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   Loader2,
@@ -15,6 +16,8 @@ import {
   Image as ImageIcon,
   CheckCircle,
   ExternalLink,
+  Upload,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -74,6 +77,13 @@ export default function EditItemDialog({
   const [youtubeId, setYoutubeId] = useState<string | null>(item.youtubeId);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  // Upload state
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadPreview, setUploadPreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Initialize preview
   useEffect(() => {
     if (item.type === "youtube" && item.youtubeId) {
@@ -100,6 +110,82 @@ export default function EditItemDialog({
       setPreviewUrl(url);
     }
   }, [url, item.type]);
+
+  // Handle file selection
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const acceptedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+    if (!acceptedTypes.includes(file.type)) {
+      setUploadError("Solo se permiten imágenes PNG, JPG o WebP");
+      return;
+    }
+
+    // Validate file size (4MB max)
+    const maxSize = 4 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setUploadError("La imagen no puede superar los 4MB");
+      return;
+    }
+
+    setSelectedFile(file);
+    setUploadError("");
+
+    // Create preview URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setUploadPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Clear selected file
+  const clearSelectedFile = () => {
+    setSelectedFile(null);
+    setUploadPreview(null);
+    setUploadError("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // Upload image to Supabase
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+
+    setIsUploading(true);
+    setUploadError("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      formData.append("bucket", "events"); // Usar bucket 'events' que ya existe
+
+      const response = await fetch("/api/upload-images", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.status === "ok" && result.files?.[0]?.url) {
+        // Update URL field with the uploaded image URL
+        setUrl(result.files[0].url);
+        setPreviewUrl(result.files[0].url);
+        clearSelectedFile();
+        setSuccess(false); // Reset success to allow saving
+      } else {
+        setUploadError(result.message || "Error al subir la imagen");
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      setUploadError("Error de conexión al subir la imagen");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -223,18 +309,106 @@ export default function EditItemDialog({
               )}
             </div>
           ) : (
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">
-                URL de la imagen
-              </label>
-              <input
-                type="text"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                required
-                placeholder="https://ejemplo.com/imagen.jpg"
-                className="w-full px-4 py-3 bg-[#0f1115] border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
+            <div className="space-y-4">
+              {/* URL Input */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  URL de la imagen
+                </label>
+                <input
+                  type="text"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  required
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                  className="w-full px-4 py-3 bg-[#0f1115] border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+
+              {/* Divider */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-gray-700" />
+                <span className="text-gray-500 text-sm">o subir nueva</span>
+                <div className="flex-1 h-px bg-gray-700" />
+              </div>
+
+              {/* Upload Section */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Subir nueva imagen
+                </label>
+
+                {/* File Input Hidden */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/jpg,image/webp"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+
+                {/* Upload Preview or Button */}
+                {uploadPreview ? (
+                  <div className="relative">
+                    <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-900 border-2 border-dashed border-green-500">
+                      <img
+                        src={uploadPreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
+                        Nueva imagen
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      <Button
+                        type="button"
+                        onClick={handleUpload}
+                        disabled={isUploading}
+                        className="flex-1 bg-green-600 hover:bg-green-700"
+                      >
+                        {isUploading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Subiendo...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4 mr-2" />
+                            Subir imagen
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={clearSelectedFile}
+                        disabled={isUploading}
+                        className="text-gray-400 hover:text-white"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full px-4 py-6 bg-[#0f1115] border-2 border-dashed border-gray-700 rounded-xl text-gray-400 hover:border-red-500 hover:text-white transition-colors flex flex-col items-center gap-2"
+                  >
+                    <Upload className="w-6 h-6" />
+                    <span>Seleccionar imagen</span>
+                    <span className="text-xs text-gray-600">PNG, JPG, WebP (max 4MB)</span>
+                  </button>
+                )}
+
+                {/* Upload Error */}
+                {uploadError && (
+                  <div className="mt-2 text-red-400 text-sm">
+                    {uploadError}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
