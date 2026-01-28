@@ -75,6 +75,8 @@ export interface ISliderWithoutItems {
  */
 export const getSliderBySection = unstable_cache(
   async (section: string): Promise<ISlider | null> => {
+    console.log(`[getSliderBySection] 🔍 Query para section="${section}"`);
+
     const slider = await prisma.slider.findFirst({
       where: {
         section,
@@ -91,6 +93,12 @@ export const getSliderBySection = unstable_cache(
         },
       },
     });
+
+    console.log(`[getSliderBySection] ${slider ? '✅ ENCONTRADO' : '❌ NULL'} section="${section}"`, slider ? {
+      name: slider.name,
+      itemsCount: slider.items.length,
+      items: slider.items.map(i => ({ id: i.id, type: i.type, isActive: i.isActive }))
+    } : 'No existe slider activo');
 
     return slider;
   },

@@ -33,14 +33,30 @@ export interface CarouselVideoItem {
 }
 
 const Carousel2 = async () => {
+  console.log('[Carousel2] 🚀 INICIO - Cargando slider stories...');
+
   // Intentar cargar desde BD primero
   const slider = await getSliderBySection("stories");
 
   // DEBUG: Log slider data
-  console.log('[Carousel2] Slider loaded:', slider ? { name: slider.name, itemsCount: slider.items.length } : 'null');
+  console.log('[Carousel2] ✅ Slider loaded:', slider ? {
+    name: slider.name,
+    itemsCount: slider.items.length,
+    isActive: slider.isActive
+  } : '❌ NULL - usando fallback');
+
   if (slider?.items) {
+    console.log('[Carousel2] 📦 TODOS los items de BD:', slider.items.map(i => ({
+      id: i.id,
+      type: i.type,
+      youtubeId: i.youtubeId,
+      url: i.url?.substring(0, 50),
+      isActive: i.isActive,
+      position: i.position
+    })));
+
     const youtubeItems = slider.items.filter(i => i.type === 'youtube');
-    console.log('[Carousel2] YouTube items from BD:', youtubeItems.map(i => ({ id: i.id, type: i.type, youtubeId: i.youtubeId, isActive: i.isActive })));
+    console.log('[Carousel2] 🎬 YouTube items:', youtubeItems.length, 'de', slider.items.length);
   }
 
   let slides: CarouselVideoItem[];

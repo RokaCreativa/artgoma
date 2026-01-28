@@ -198,13 +198,23 @@ export async function deleteSlider(id: number) {
  * Crea un nuevo item en un slider
  */
 export async function createSliderItem(data: z.infer<typeof SliderItemSchema>) {
+  console.log('[createSliderItem] 🚀 INICIO - Data recibida:', {
+    sliderId: data.sliderId,
+    type: data.type,
+    youtubeId: data.youtubeId,
+    url: data.url?.substring(0, 50),
+    title: data.title
+  });
+
   const isAuth = await isAdminAuthenticated();
   if (!isAuth) {
+    console.log('[createSliderItem] ❌ NO AUTORIZADO');
     return { success: false, error: "No autorizado" };
   }
 
   try {
     const validated = SliderItemSchema.parse(data);
+    console.log('[createSliderItem] ✅ Validación Zod OK');
 
     // Obtener la posición máxima actual
     const maxPosition = await prisma.sliderItem.findFirst({
@@ -213,19 +223,27 @@ export async function createSliderItem(data: z.infer<typeof SliderItemSchema>) {
       select: { position: true },
     });
 
+    const newPosition = validated.position || (maxPosition?.position ?? 0) + 1;
+    console.log('[createSliderItem] 📍 Position:', newPosition, '(max actual:', maxPosition?.position, ')');
+
     const item = await prisma.sliderItem.create({
       data: {
         ...validated,
-        position: validated.position || (maxPosition?.position ?? 0) + 1,
+        position: newPosition,
       },
     });
 
+    console.log('[createSliderItem] ✅ CREADO en BD - ID:', item.id, 'Type:', item.type, 'YouTubeId:', item.youtubeId);
+
+    console.log('[createSliderItem] 🔄 Invalidando cache tag="sliders"...');
     revalidateTag("sliders", "max"); // Invalida cache de unstable_cache
     revalidatePath(`/admin/sliders/${data.sliderId}`);
     revalidatePath("/");
+    console.log('[createSliderItem] ✅ Cache invalidado');
 
     return { success: true, data: item };
   } catch (error) {
+    console.error('[createSliderItem] ❌ ERROR:', error);
     if (error instanceof z.ZodError) {
       return { success: false, error: error.errors[0].message };
     }

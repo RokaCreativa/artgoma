@@ -179,6 +179,8 @@ export default function AddItemDialog({ sliderId }: AddItemDialogProps) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('[AddItemDialog] 🚀 Submit - Type:', itemType, 'YouTubeId:', youtubeId, 'URL:', url?.substring(0, 50));
+
     setIsLoading(true);
     setError("");
     setSuccess(false);
@@ -186,12 +188,14 @@ export default function AddItemDialog({ sliderId }: AddItemDialogProps) {
     // Validate
     if (itemType === "youtube") {
       if (!youtubeId) {
+        console.log('[AddItemDialog] ❌ YouTube ID vacío');
         setError("URL de YouTube inválida. Pega el link completo del video.");
         setIsLoading(false);
         return;
       }
     } else if (itemType === "image") {
       if (!url) {
+        console.log('[AddItemDialog] ❌ URL imagen vacía');
         if (imageMode === "upload") {
           setError("Primero sube una imagen usando el botón 'Subir imagen'");
         } else {
@@ -202,7 +206,7 @@ export default function AddItemDialog({ sliderId }: AddItemDialogProps) {
       }
     }
 
-    const result = await createSliderItem({
+    const itemData = {
       sliderId,
       type: itemType,
       url: itemType === "image" ? url : undefined,
@@ -210,20 +214,29 @@ export default function AddItemDialog({ sliderId }: AddItemDialogProps) {
       title: title || undefined,
       artistName: artistName || undefined,
       isActive: true,
-      position: 0, // Se asigna automáticamente al final
-    });
+      position: 0,
+    };
+
+    console.log('[AddItemDialog] 📤 Llamando createSliderItem con:', itemData);
+
+    const result = await createSliderItem(itemData);
+
+    console.log('[AddItemDialog] 📥 Resultado:', result.success ? '✅ SUCCESS' : '❌ FAIL', result);
 
     setIsLoading(false);
 
     if (result.success) {
       setSuccess(true);
+      console.log('[AddItemDialog] ✅ Item creado - Refresh en 500ms');
       // Mostrar success por un momento antes de cerrar
       setTimeout(() => {
         setOpen(false);
         resetForm();
         router.refresh();
+        console.log('[AddItemDialog] 🔄 router.refresh() ejecutado');
       }, 500);
     } else {
+      console.error('[AddItemDialog] ❌ Error al crear item:', result.error);
       setError(result.error || "Error al agregar item");
     }
   };
