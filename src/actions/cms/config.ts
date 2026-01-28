@@ -290,7 +290,7 @@ export async function upsertConfig(
     // Invalidar todos los caches relacionados
     revalidateTag("cms-config");
     revalidateTag("site-config");
-    revalidateTag("appearance"); // Para appearance configs
+    revalidateTag("appearance", "max"); // Para appearance configs
     revalidatePath("/admin/settings");
 
     return { success: true, data: result };
@@ -334,7 +334,7 @@ export async function deleteConfig(id: number): Promise<{
     // Invalidar todos los caches relacionados
     revalidateTag("cms-config");
     revalidateTag("site-config");
-    revalidateTag("appearance");
+    revalidateTag("appearance", "max");
     revalidatePath("/admin/settings");
 
     return {
@@ -436,7 +436,7 @@ export async function upsertConfigBatch(
     // Invalidar todos los caches relacionados
     revalidateTag("cms-config");
     revalidateTag("site-config");
-    revalidateTag("appearance");
+    revalidateTag("appearance", "max");
     revalidatePath("/admin/settings");
 
     return {
