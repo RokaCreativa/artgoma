@@ -14,7 +14,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { EmblaOptionsType } from "embla-carousel";
+import { EmblaOptionsType, EmblaCarouselType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import AutoScroll from "embla-carousel-auto-scroll";
 import {
