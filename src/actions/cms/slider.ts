@@ -127,7 +127,7 @@ export async function createSlider(data: z.infer<typeof SliderSchema>) {
       data: validated,
     });
 
-    revalidateTag("sliders"); // Invalida cache de unstable_cache
+    revalidateTag("sliders", "max"); // Invalida cache de unstable_cache
     revalidatePath("/admin/sliders");
     revalidatePath("/"); // Revalidar home
 
@@ -155,7 +155,7 @@ export async function updateSlider(id: number, data: Partial<z.infer<typeof Slid
       data,
     });
 
-    revalidateTag("sliders"); // Invalida cache de unstable_cache
+    revalidateTag("sliders", "max"); // Invalida cache de unstable_cache
     revalidatePath("/admin/sliders");
     revalidatePath(`/admin/sliders/${id}`);
     revalidatePath("/");
@@ -180,7 +180,7 @@ export async function deleteSlider(id: number) {
       where: { id },
     });
 
-    revalidateTag("sliders"); // Invalida cache de unstable_cache
+    revalidateTag("sliders", "max"); // Invalida cache de unstable_cache
     revalidatePath("/admin/sliders");
     revalidatePath("/");
 
@@ -220,7 +220,7 @@ export async function createSliderItem(data: z.infer<typeof SliderItemSchema>) {
       },
     });
 
-    revalidateTag("sliders"); // Invalida cache de unstable_cache
+    revalidateTag("sliders", "max"); // Invalida cache de unstable_cache
     revalidatePath(`/admin/sliders/${data.sliderId}`);
     revalidatePath("/");
 
@@ -248,7 +248,7 @@ export async function updateSliderItem(id: number, data: Partial<z.infer<typeof 
       data,
     });
 
-    revalidateTag("sliders"); // Invalida cache de unstable_cache
+    revalidateTag("sliders", "max"); // Invalida cache de unstable_cache
     revalidatePath(`/admin/sliders/${item.sliderId}`);
     revalidatePath("/");
 
@@ -272,7 +272,7 @@ export async function deleteSliderItem(id: number) {
       where: { id },
     });
 
-    revalidateTag("sliders"); // Invalida cache de unstable_cache
+    revalidateTag("sliders", "max"); // Invalida cache de unstable_cache
     revalidatePath(`/admin/sliders/${item.sliderId}`);
     revalidatePath("/");
 
@@ -302,7 +302,7 @@ export async function reorderSliderItems(sliderId: number, itemIds: number[]) {
       )
     );
 
-    revalidateTag("sliders"); // Invalida cache de unstable_cache
+    revalidateTag("sliders", "max"); // Invalida cache de unstable_cache
     revalidatePath(`/admin/sliders/${sliderId}`);
     revalidatePath("/");
 
@@ -332,7 +332,7 @@ export async function toggleSliderItemActive(id: number) {
       data: { isActive: !item.isActive },
     });
 
-    revalidateTag("sliders"); // Invalida cache de unstable_cache
+    revalidateTag("sliders", "max"); // Invalida cache de unstable_cache
     revalidatePath(`/admin/sliders/${item.sliderId}`);
     revalidatePath("/");
 
