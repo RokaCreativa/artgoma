@@ -95,6 +95,57 @@ const CONFIGS = [
     group: "footer",
     label: "Website",
   },
+
+  // === APPEARANCE (Colores + Fonts) ===
+  {
+    key: "bg_primary",
+    value: "#1c1f24",
+    type: "color",
+    group: "appearance",
+    label: "Color Fondo Principal",
+  },
+  {
+    key: "bg_surface",
+    value: "#2a2d35",
+    type: "color",
+    group: "appearance",
+    label: "Color Superficies/Cards",
+  },
+  {
+    key: "bg_input",
+    value: "#0f1115",
+    type: "color",
+    group: "appearance",
+    label: "Color Fondo Inputs",
+  },
+  {
+    key: "accent_color",
+    value: "#dc2626",
+    type: "color",
+    group: "appearance",
+    label: "Color de Acento (Rojo)",
+  },
+  {
+    key: "bg_footer",
+    value: "#000000",
+    type: "color",
+    group: "appearance",
+    label: "Color Fondo Footer",
+  },
+  {
+    key: "font_display",
+    value: "Cormorant Garamond",
+    type: "select",
+    group: "appearance",
+    label: "Tipografia Titulos",
+  },
+  {
+    key: "font_body",
+    value: "Montserrat",
+    type: "select",
+    group: "appearance",
+    label: "Tipografia Cuerpo",
+  },
 ];
 
 /**

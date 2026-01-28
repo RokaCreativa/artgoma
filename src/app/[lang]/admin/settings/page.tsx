@@ -17,6 +17,7 @@ import { getAllConfigsGrouped, seedDefaultConfigs } from "@/actions/cms/config";
 import {
   PREDEFINED_CONFIGS,
   ConfigGroup as ConfigGroupType,
+  FONT_OPTIONS,
 } from "@/lib/cms/configConstants";
 import { Locale } from "@/configs/i18n.config";
 import { Settings } from "lucide-react";
@@ -35,10 +36,60 @@ const CONFIG_GROUPS_DEFINITION: Array<{
   configs: Array<{
     key: string;
     label: string;
-    type: "text" | "url" | "email" | "phone";
+    type: "text" | "url" | "email" | "phone" | "color" | "select";
     placeholder?: string;
+    options?: Array<{ value: string; label: string }>;
   }>;
 }> = [
+  {
+    key: "appearance",
+    title: "Apariencia",
+    iconName: "palette",
+    configs: [
+      {
+        key: "bg_primary",
+        label: "Color de Fondo Principal",
+        type: "color",
+        placeholder: "#1c1f24",
+      },
+      {
+        key: "bg_surface",
+        label: "Color de Superficies",
+        type: "color",
+        placeholder: "#2a2d35",
+      },
+      {
+        key: "bg_input",
+        label: "Color de Inputs",
+        type: "color",
+        placeholder: "#0f1115",
+      },
+      {
+        key: "accent_color",
+        label: "Color de Acento",
+        type: "color",
+        placeholder: "#dc2626",
+      },
+      {
+        key: "bg_footer",
+        label: "Color del Footer",
+        type: "color",
+        placeholder: "#000000",
+      },
+      {
+        key: "font_display",
+        label: "Fuente de Titulos (Display)",
+        type: "select",
+        options: [...FONT_OPTIONS.display],
+      },
+      {
+        key: "font_body",
+        label: "Fuente de Textos (Body)",
+        type: "select",
+        options: [...FONT_OPTIONS.body],
+      },
+    ],
+  },
   {
     key: "contact",
     title: "Contacto",

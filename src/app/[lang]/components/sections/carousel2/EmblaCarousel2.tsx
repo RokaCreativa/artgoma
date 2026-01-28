@@ -16,7 +16,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
+import AutoScroll from "embla-carousel-auto-scroll";
 import {
   NextButton,
   PrevButton,
@@ -36,19 +36,31 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
   const [isPlaying, setIsPlaying] = useState(true);
 
   const [emblaRef, emblaApi] = useEmblaCarousel(options, [
-    Autoplay({ playOnInit: true, delay: 5000, stopOnInteraction: false })
+    AutoScroll({ playOnInit: true, speed: 1, stopOnInteraction: true })
   ]);
 
   // DEBUG: Log slides para verificar datos YouTube
   console.log('[EmblaCarousel2] Total slides:', slides.length);
   console.log('[EmblaCarousel2] YouTube items:', slides.filter(s => s.type === 'youtube' || s.format === 'youtube').map(s => ({ type: s.type, format: s.format, youtubeId: s.youtubeId })));
 
+  // Callback para detener AutoScroll cuando se usan las flechas
+  const onButtonAutoplayClick = useCallback(
+    (emblaApi: EmblaCarouselType) => {
+      const autoScroll = emblaApi?.plugins()?.autoScroll;
+      if (!autoScroll) return;
+
+      const resetOrStop = autoScroll.reset || autoScroll.stop;
+      resetOrStop && resetOrStop();
+    },
+    []
+  );
+
   const {
     prevBtnDisabled,
     nextBtnDisabled,
     onPrevButtonClick,
     onNextButtonClick,
-  } = usePrevNextButtons(emblaApi);
+  } = usePrevNextButtons(emblaApi, onButtonAutoplayClick);
 
   return (
     <div className="max-w-full mx-auto">

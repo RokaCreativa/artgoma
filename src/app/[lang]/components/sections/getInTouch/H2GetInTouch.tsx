@@ -9,7 +9,7 @@ const H2GetInTouch = ({
   };
 }) => {
   return (
-    <h2 className="text-white text-3xl md:text-4xl lg:text-6xl font-semibold text-end">
+    <h2 className="font-display text-white text-3xl md:text-4xl lg:text-6xl font-semibold text-end">
       {text.span1} <span className="text-red-600">{text.span2}</span>
     </h2>
   );

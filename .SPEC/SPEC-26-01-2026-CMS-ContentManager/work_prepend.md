@@ -9,25 +9,29 @@
 
 | Item | Estado |
 |------|--------|
-| **Fase actual** | Fases 1-3 COMPLETADAS (85%) - Solo falta Fase 4 Polish |
-| **Tarea actual** | STANDBY - Esperando ordenes de Rodolfo |
-| **Bloqueadores** | Ninguno - Pendiente verificacion de Rodolfo (textos multiidioma) |
-| **Proxima accion** | Rodolfo: Probar editar texto en admin y verificar que aparece en frontend |
-| **Ultimo commit** | (pendiente) |
-| **BD Status** | 6 sliders, 14 items en stories, 60 contenidos, 12 configs |
-| **spec.md** | ✅ Sincronizado 28/01/2026 - 9 REQs, 8 completados |
+| **Fase actual** | Fase 5 COMPLETADA 100% - Appearance Config ✅ |
+| **Tarea actual** | LISTO PARA BUILD FINAL |
+| **Bloqueadores** | Ninguno |
+| **Proxima accion** | Build + Commit + Push (cuando Rodolfo apruebe) |
+| **Ultimo commit** | (pendiente - sin commits por instrucción de Rodolfo) |
+| **BD Status** | 6 sliders, 48 items, 60 contenidos, 19 configs (12 orig + 7 appearance) |
+| **spec.md** | ✅ REQ-10 completado - Fase 5 100% |
 
 ---
 
 ## 📊 PROGRESO VISUAL
 
 ```
-FASE 1: MVP Sliders    [██████████] 100% (8/8 tareas)
-FASE 2: Textos         [██████████] 100% (5/5 tareas)
-FASE 3: Config         [██████████] 100% (4/4 tareas)
+FASE 1: MVP Sliders    [██████████] 100% (8/8 tareas) ✅
+FASE 2: Textos         [██████████] 100% (5/5 tareas) ✅
+FASE 3: Config         [██████████] 100% (4/4 tareas) ✅
+FASE 5: Appearance     [██████████] 100% (4/4 tareas) ✅ NUEVO 28/01
 FASE 4: Polish         [░░░░░░░░░░] 0%
 ────────────────────────────────────
-TOTAL                  [████████░░] 85%
+TOTAL                  [████████░░] 88% (20/23 tareas)
++ TAREA 5.3: Admin UI Appearance Settings (28/01/2026) ✅
++ TAREA 5.4: CSS Variables Dinamicas desde BD (28/01/2026) ✅
++ TAREA 5.2: Font Display Cormorant Garamond implementada (28/01/2026) ✅
 + BONUS: Hero Carousel integrado
 + BONUS: Golden Tickets carousel integrado
 + FIX: AutoScroll "DISFRUTA EN VIVO"
@@ -40,11 +44,566 @@ TOTAL                  [████████░░] 85%
 + FIX: Cache invalidation con revalidateTag("sliders") (28/01/2026)
 + DEBUG: Videos YouTube en carousel stories (28/01/2026)
 + FIX CRITICO: Cache invalidation textos multiidioma (28/01/2026)
++ PROPUESTA: Sistema de colores/apariencia configurable (28/01/2026)
++ INVESTIGACION: Tipografias del proyecto (28/01/2026)
 ```
 
 ---
 
 ## 📝 LOG DE TRABAJO
+
+### 28/01/2026 04:30 - 🎉 FASE 5 COMPLETADA 100%: APPEARANCE CONFIG
+
+**4 tareas completadas por 4 agentes Opus en paralelo**:
+- ✅ 5.1 Migración 92+ colores a CSS variables
+- ✅ 5.2 Cormorant Garamond para títulos
+- ✅ 5.3 Admin UI con color pickers + font dropdowns
+- ✅ 5.4 CSS dinámico inyectado desde BD
+
+**Impacto**: 50+ archivos modificados
+**BD**: 19 configs totales (7 appearance nuevas)
+**Resultado**: Karen puede cambiar colores y fonts desde admin panel
+
+**Pendiente**: Build + Commit + Push final
+
+**🔗 Spec ref**: REQ-10 (100%), tasks.md Fase 5 (4/4)
+**📊 Progreso global**: 21/24 tareas (88%)
+
+---
+
+### 28/01/2026 - TAREA 5.3 COMPLETADA: ADMIN UI APPEARANCE SETTINGS ✅
+
+**Accion**: Implementar panel admin para configurar colores y fuentes de la web.
+
+**Archivos modificados**:
+
+1. **`src/lib/cms/configConstants.ts`**:
+   - Agregado grupo `appearance` a CONFIG_GROUPS (primero en el objeto)
+   - Nuevos CONFIG_TYPES: `color` y `select`
+   - PREDEFINED_KEYS con 7 keys de appearance
+   - FONT_OPTIONS exportado con opciones para Display y Body fonts
+   - PREDEFINED_CONFIGS con 7 configs de appearance:
+     - bg_primary (#1c1f24)
+     - bg_surface (#2a2d35)
+     - bg_input (#0f1115)
+     - accent_color (#dc2626)
+     - bg_footer (#000000)
+     - font_display (Cormorant Garamond)
+     - font_body (Montserrat)
+
+2. **`src/actions/cms/config.ts`**:
+   - ConfigGroupSchema actualizado con "appearance"
+   - ConfigTypeSchema actualizado con "color" y "select"
+   - Ya tenia revalidateTag("appearance") del fix anterior
+
+3. **`src/app/[lang]/admin/settings/page.tsx`**:
+   - Import FONT_OPTIONS de configConstants
+   - CONFIG_GROUPS_DEFINITION actualizado con tipo color y select
+   - Nuevo grupo "Apariencia" (iconName: "palette") al inicio del array
+   - 5 color pickers + 2 dropdowns de fonts
+
+4. **`src/app/[lang]/admin/settings/components/ConfigGroup.tsx`**:
+   - Import Palette de lucide-react
+   - iconMap actualizado con "palette"
+   - ConfigItem interface actualizada con type color/select y options
+   - HEX_COLOR_REGEX para validacion de colores
+   - validateByType actualizado con case "color" y "select"
+   - Renderizado condicional en el JSX:
+     - type="color": Preview color + input color picker + input text hex
+     - type="select": Dropdown con opciones
+     - default: Input estandar (text, email, url, phone)
+
+**Caracteristicas UI**:
+- Grupo "Apariencia" aparece primero en la lista
+- Color pickers con 3 elementos: preview box + native picker + input hex
+- Validacion regex para hex colors (#RGB o #RRGGBB)
+- Dropdowns con opciones de FONT_OPTIONS
+- Misma UX que otros grupos: colapsable, feedback guardado, boton Guardar
+
+**Orden final de grupos en Settings**:
+1. Apariencia (colors + fonts)
+2. Contacto (phone, email, address, whatsapp, maps_link)
+3. Redes Sociales (facebook, instagram, youtube, twitter)
+4. Footer (copyright, website, year)
+
+**🔗 Spec ref**: REQ-10 (Appearance Config), Tarea 5.3
+**📊 Status**: COMPLETADO - STANDBY para verificacion
+
+---
+
+### 28/01/2026 - TAREA 5.4 COMPLETADA: CSS VARIABLES DINAMICAS DESDE BD ✅
+
+**Accion**: Integrar appearance configs en frontend para inyectar CSS variables dinamicas.
+
+**Archivos creados**:
+
+1. **`src/lib/cms/appearanceUtils.ts`** - Helper completo:
+   - `getAppearanceConfigs()` - Query grupo "appearance" con cache 300s
+   - `generateAppearanceCSS()` - Genera string CSS con variables custom
+   - `generateGoogleFontsURL()` - URL para cargar fonts extra
+   - `DEFAULT_APPEARANCE` - Valores fallback (colores actuales del proyecto)
+   - `AVAILABLE_FONTS` - Mapeo de fonts disponibles para display/body
+   - `isValidHexColor()` / `isValidFont()` - Validadores
+
+**Archivos modificados**:
+
+1. **`src/app/[lang]/layout.tsx`**:
+   - Importa helpers de appearanceUtils
+   - Carga appearance configs en paralelo con dictionary
+   - Genera CSS string con `generateAppearanceCSS()`
+   - Inyecta `<style dangerouslySetInnerHTML>` en `<head>`
+   - Carga fonts extra con `<link>` tags si se configuran diferentes
+
+2. **`prisma/seeds/seed-config.ts`**:
+   - Agregado grupo "appearance" con 7 configs:
+     - bg_primary, bg_surface, bg_input, accent_color, bg_footer
+     - font_display, font_body
+   - Valores default: colores actuales del proyecto
+
+3. **`src/lib/cms/configConstants.ts`** (ya actualizado previamente):
+   - Grupo "appearance" agregado
+   - PREDEFINED_CONFIGS con colores y fonts
+   - FONT_OPTIONS para dropdowns
+
+4. **`src/actions/cms/config.ts`**:
+   - Agregado `revalidateTag("appearance")` en upsertConfig, deleteConfig, upsertConfigBatch
+   - ConfigGroupSchema ya incluia "appearance"
+
+**Variables CSS inyectadas**:
+```css
+:root {
+  --artgoma-bg-primary: #1c1f24;
+  --artgoma-bg-surface: #2a2d35;
+  --artgoma-bg-input: #0f1115;
+  --artgoma-accent: #dc2626;
+  --artgoma-bg-footer: #000000;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Montserrat", system-ui, sans-serif;
+}
+```
+
+**Para verificar**:
+1. Ejecutar `npm run db:seed:config` para poblar appearance configs
+2. Cambiar un color en admin → Settings → Appearance (despues de crear UI)
+3. Verificar que CSS variables se inyectan en `<html>` del frontend
+4. Cambiar font desde admin → titulos cambian
+
+**Pendiente Fase 5**:
+- Tarea 5.1: Migrar colores hardcoded a CSS variables (buscar/reemplazar en componentes)
+- Tarea 5.3: Admin UI para Appearance Settings (color pickers + dropdowns)
+
+**🔗 Spec ref**: REQ-10, tasks.md → Tarea 5.4
+**📊 Status**: COMPLETADA - Falta UI de admin y migracion de colores hardcoded
+
+---
+
+### 28/01/2026 - TAREA 5.2 COMPLETADA: FONT DISPLAY PARA TITULOS ✅
+
+**Accion**: Implementar sistema de fonts configurables con Cormorant Garamond para titulos.
+
+**Archivos modificados**:
+
+1. **`src/app/[lang]/layout.tsx`**:
+   - Importado `Cormorant_Garamond` de next/font/google
+   - Configurado weights: 400, 600, 700
+   - Variable CSS: `--font-display`
+   - Montserrat actualizado con weights: 400, 500, 600, 700
+   - Variable CSS: `--font-sans`
+   - Body className: `${montserrat.variable} ${cormorant.variable} font-sans`
+
+2. **`tailwind.config.ts`**:
+   - Agregado `fontFamily` en theme:
+     ```typescript
+     fontFamily: {
+       sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+       display: ['var(--font-display)', 'Georgia', 'serif'],
+     }
+     ```
+
+3. **Componentes H1/H2 actualizados con `font-display`**:
+   - `H1hero.tsx` - Hero principal
+   - `H1Carousel.tsx` - "DISFRUTA EN VIVO"
+   - `H2Connect.tsx` - "CONNECT"
+   - `H2GetInTouch.tsx` - "GET IN TOUCH"
+   - `H2GetInspired.tsx` - "GET INSPIRED"
+   - `H2Location.tsx` - "OUR LOCATION"
+
+**Resultado**:
+- Titulos principales ahora usan Cormorant Garamond (serif elegante)
+- Body/UI mantiene Montserrat (sans-serif limpia)
+- Contraste visual que transmite lujo artistico de galeria de arte
+
+**Uso en componentes**:
+```tsx
+// Titulos (serif elegante)
+<h1 className="font-display text-6xl">GET INSPIRED</h1>
+
+// Body/UI (sans legible)
+<p className="font-sans text-lg">Texto normal...</p>
+```
+
+**Spec ref**: REQ-10 (Appearance Config), Tarea 5.2
+**Status**: COMPLETADA - Pendiente verificacion visual de Rodolfo
+
+---
+
+### 28/01/2026 03:00 - FASE 5 CREADA: APPEARANCE CONFIG 🎨
+
+**Decisión Rodolfo**: "5 horas ahora mejor que 20 en 10 días" - Luz verde total para agentes
+
+**Investigación completada**:
+- 92+ colores hardcodeados (`bg-[#1c1f24]` x39, `bg-[#0f1115]` x15, `bg-[#2a2d35]` x13)
+- Font única: Montserrat sin weights - no transmite lujo
+- Variables CSS shadcn/ui existen pero NO se usan
+
+**SPEC actualizado con Fase 5**:
+- **tasks.md**: 4 nuevas tareas (5.1 a 5.4) - 5h estimadas
+- **spec.md**: REQ-10 agregado con criterios y beneficios
+- **Progreso**: 17/24 tareas (71%) - nueva fase insertada antes de Fase 4
+
+**Estrategia**: Lanzar 4 agentes Opus en paralelo:
+1. Migración colores → CSS variables (1.5h)
+2. Fonts configurables → Display + Body (1.5h)
+3. Admin UI → Appearance settings (1.5h)
+4. Integración → CSS dinámico desde BD (1h)
+
+**Próximo paso**: Lanzar agentes que lean SPEC completo y actualicen al terminar
+
+---
+
+### 28/01/2026 - INVESTIGACION TIPOGRAFIAS DEL PROYECTO
+
+**Tarea solicitada por Rodolfo**: Investigar las fonts usadas en ArtGoMA y recomendar mejoras.
+
+---
+
+#### 1. FONT ACTUAL: MONTSERRAT (Google Fonts)
+
+**Ubicacion del codigo**:
+```typescript
+// src/app/[lang]/layout.tsx (lineas 2 y 12)
+import { Montserrat } from "next/font/google";
+const montserrat = Montserrat({ subsets: ["latin"] });
+
+// Se aplica en el body (linea 60):
+<body className={montserrat.className}>
+```
+
+**Caracteristicas de Montserrat**:
+- Tipo: Sans-serif geometrica
+- Creadora: Julieta Ulanovsky (inspirada en carteles de Buenos Aires)
+- Familia: 18 weights (100-900, normal e italica)
+- Uso actual: Solo subset "latin", sin especificar weights
+
+---
+
+#### 2. COMO SE USA EN EL PROYECTO
+
+| Componente | Clases Tailwind | Ejemplo |
+|------------|-----------------|---------|
+| `H1hero.tsx` | `text-3xl md:text-4xl lg:text-6xl text-white` | Titulo hero principal |
+| `H2GetInspired.tsx` | `text-4xl md:text-6xl text-white font-semibold` | "GET INSPIRED" |
+| Textos generales | Heredan de body | Parrafos normales |
+
+**Observaciones**:
+- NO hay font-weight personalizado (solo `font-semibold` ocasional)
+- NO hay letter-spacing (tracking) custom
+- NO hay line-height (leading) custom
+- NO hay fonts secundarias (serif/display para contraste)
+- NO hay definicion de fonts en globals.css ni tailwind.config.ts
+
+---
+
+#### 3. ANALISIS: ES APROPIADA PARA UNA GALERIA DE ARTE?
+
+**PROS de Montserrat**:
+- Moderna y limpia
+- Muy legible en pantallas
+- Gratis y optimizada (next/font)
+- Popular y probada
+
+**CONTRAS para una galeria de arte**:
+- Font "generica" - no transmite lujo ni exclusividad
+- Muy usada en proyectos corporativos/tech
+- Carece de personalidad artistica
+- Los titulos no tienen impacto visual diferenciador
+
+**VEREDICTO: 6/10 para galeria de arte**
+- Funciona, pero no destaca
+- ArtGoMA merece algo con mas caracter
+
+---
+
+#### 4. RECOMENDACIONES
+
+**OPCION A: Combinacion Display + Sans (RECOMENDADA)**
+
+```typescript
+// layout.tsx mejorado
+import { Cormorant_Garamond, Montserrat } from "next/font/google";
+
+// Titulos (h1, h2) - elegancia artistica
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-display"
+});
+
+// Body/UI - mantener Montserrat
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-sans"
+});
+
+// En body:
+<body className={`${montserrat.variable} ${cormorant.variable} font-sans`}>
+```
+
+**Alternativas para titulos (Display)**:
+| Font | Estilo | Ideal para |
+|------|--------|------------|
+| **Playfair Display** | Clasico, elegante | Arte/moda/lujo |
+| **Cormorant Garamond** | Sofisticado | Galerias, editorial |
+| **Libre Baskerville** | Tradicional, serio | Academico, museos |
+| **DM Serif Display** | Moderno con caracter | Branding premium |
+
+**Alternativas para body (Sans)**:
+| Font | Caracteristica |
+|------|----------------|
+| **Inter** | Mejor que Montserrat para UI |
+| **Outfit** | Geometrica mas distintiva |
+| **Space Grotesk** | Mas caracter sin perder legibilidad |
+
+---
+
+#### 5. CONFIGURACION EN TAILWIND (Quick Win)
+
+```typescript
+// tailwind.config.ts - Agregar
+fontFamily: {
+  sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+  display: ['var(--font-display)', 'Georgia', 'serif'],
+}
+```
+
+```tsx
+// Uso en componentes
+<h1 className="font-display text-6xl">GET INSPIRED</h1>  // Cormorant
+<p className="font-sans text-lg">Texto normal...</p>      // Montserrat
+```
+
+---
+
+#### 6. INTEGRACION CON CMS (SI SE QUIERE CONFIGURABLE)
+
+**Modelo propuesto para SiteConfig**:
+```typescript
+// Nuevas keys en grupo "typography":
+{ key: "font_display", value: "Cormorant Garamond", type: "select" }
+{ key: "font_body",    value: "Montserrat",         type: "select" }
+{ key: "font_size_base", value: "16",               type: "number" }
+```
+
+**Complejidad: MEDIA**
+- Requiere modificar layout.tsx para cargar fonts dinamicamente
+- Requiere CSS variables
+- Dropdown con 5-10 fonts probadas (NO libertad total)
+- Preview en tiempo real
+
+---
+
+#### 7. RESUMEN EJECUTIVO
+
+| Item | Estado Actual | Recomendacion |
+|------|---------------|---------------|
+| Font principal | Montserrat (solo esta) | Mantener para body |
+| Font titulos | Montserrat (misma) | Agregar Cormorant/Playfair |
+| Ubicacion | layout.tsx L2, L12 | Sin cambios |
+| Nota actual | 6/10 | Potencial 8.5/10 con serif |
+| Configurable CMS | No | Posible (complejidad media) |
+
+---
+
+**Spec ref**: SPEC-26-01-2026-CMS-ContentManager (relacionado con REQ-05 UI/UX)
+**Status**: INVESTIGACION COMPLETADA - STANDBY esperando decision de Rodolfo
+
+---
+
+### 28/01/2026 - INVESTIGACION COLORES DE FONDO + PROPUESTA SISTEMA APARIENCIA
+
+**Objetivo**: Investigar colores de fondo actuales y proponer sistema de configuracion desde admin panel.
+
+---
+
+#### 1. ANALISIS DE COLORES ACTUALES
+
+**A. Variables CSS en globals.css**:
+```css
+/* Sistema de variables shadcn/ui (HSL format) */
+:root {
+  --background: 0 0% 100%;          /* Blanco (modo claro - NO USADO) */
+  --foreground: 222.2 84% 4.9%;     /* Texto oscuro */
+  --card: 0 0% 100%;                /* Cards */
+  --primary: 222.2 47.4% 11.2%;     /* Primario */
+  /* ... mas variables shadcn */
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;     /* Fondo oscuro (dark mode) */
+  /* ... variables dark */
+}
+```
+
+**B. Colores HARDCODEADOS encontrados (ordenados por uso)**:
+
+| Color HEX | Uso | Componentes |
+|-----------|-----|-------------|
+| `#1c1f24` | **FONDO PRINCIPAL** | Carousels, Admin layout/dialogs, VIP page |
+| `#0f1115` | **FONDO ADMIN (base)** | Admin layout |
+| `#2a2d35` | **SUPERFICIES/CARDS** | Admin cards, sidebar, dialogs |
+| `bg-black` | **FOOTER + LAYOUTS** | Footer, login, register, events |
+| `bg-black/xx` | **OVERLAYS** | Navbar, dropdowns, botones |
+| `bg-gray-950` | **BOTONES** | Hero buttons, confirm buttons |
+
+**C. Colores por zona del sitio**:
+
+```
+FRONTEND PUBLICO:
+├── Hero: bg transparente (imagen de fondo)
+├── Carousels: bg-[#1c1f24]
+├── Secciones: bg-[#1c1f24]
+├── Footer: bg-black
+└── Navbar: bg-black/60 backdrop-blur
+
+ADMIN PANEL:
+├── Layout: bg-[#0f1115]
+├── Sidebar: bg-[#1c1f24]
+├── Header: bg-[#1c1f24]
+├── Cards: bg-[#1c1f24]
+├── Superficies: bg-[#2a2d35]
+├── Inputs: bg-[#0f1115]
+└── Dialogs: bg-[#1c1f24]
+```
+
+---
+
+#### 2. HALLAZGOS CLAVE
+
+**Situacion actual**:
+- **75+ ocurrencias** de colores hardcodeados en 30+ archivos
+- **3 colores principales** dominan: `#1c1f24`, `#2a2d35`, `#0f1115`
+- Tailwind config NO define estos colores - todos inline
+- NO hay variables CSS personalizadas para estos colores
+- El modo oscuro shadcn (.dark) NO se usa en la app
+
+**Patron consistente**:
+- Admin panel: 100% colores hardcodeados (ya estan bien)
+- Frontend: Mayoria con `#1c1f24` en secciones
+
+---
+
+#### 3. PROPUESTA: SISTEMA DE APARIENCIA CONFIGURABLE
+
+**Pregunta critica para Rodolfo**:
+Hay 2 niveles de configuracion posibles:
+
+**NIVEL 1 - SOLO COLORES CLAVE (Recomendado - 2-3 horas)**
+
+Agregar 3-5 configs al grupo "appearance":
+
+```typescript
+// Nuevas configs en SiteConfig
+{
+  group: "appearance",
+  configs: [
+    { key: "bg_primary",    label: "Fondo principal",      value: "#1c1f24", type: "color" },
+    { key: "bg_secondary",  label: "Fondo secciones",      value: "#0f1115", type: "color" },
+    { key: "accent_color",  label: "Color de acento",      value: "#dc2626", type: "color" },
+    { key: "footer_bg",     label: "Fondo footer",         value: "#000000", type: "color" },
+  ]
+}
+```
+
+**Implementacion**:
+1. Agregar nuevo grupo "appearance" a config.ts
+2. Crear UI en admin/settings con color pickers
+3. Inyectar colores como CSS variables en el root layout
+4. Buscar/reemplazar hardcoded colors por var(--bg-primary) etc
+
+**NIVEL 2 - SISTEMA COMPLETO DE TEMAS (5-8 horas)**
+
+Ademas de lo anterior:
+- Font family configurable (Google Fonts)
+- Espaciados/radios de bordes
+- Presets de temas (Oscuro, Claro, Rojo, etc)
+- Preview en tiempo real
+
+---
+
+#### 4. MI RECOMENDACION
+
+**Empezar con NIVEL 1** porque:
+
+1. **ROI alto**: Solo 3-4 configs dan control del 80% visual
+2. **Bajo riesgo**: No rompe nada existente
+3. **Facil de extender**: Si funciona, agregamos mas despues
+4. **Ya tenemos infraestructura**: SiteConfig + grupo "appearance" facil
+
+**Configs sugeridas para NIVEL 1**:
+
+| Key | Label en Admin | Default | Tipo | Uso |
+|-----|----------------|---------|------|-----|
+| `bg_primary` | Color de fondo principal | `#1c1f24` | color | Secciones, carousels |
+| `bg_surface` | Color de superficies | `#2a2d35` | color | Cards, menus |
+| `accent_color` | Color de acento | `#dc2626` | color | Botones hover, links |
+| `footer_bg` | Fondo del footer | `#000000` | color | Footer |
+| `font_family` | Tipografia | `Inter` | select | Toda la web |
+
+---
+
+#### 5. FLUJO TECNICO PROPUESTO
+
+```
+ADMIN                           FRONTEND
+  |                                |
+  ├─ Karen cambia bg_primary ─────►│
+  │  a #2a2d35                     │
+  │                                │
+  ├─ Guarda en SiteConfig ────────►│
+  │                                │
+  │           revalidateTag ◄──────┤
+  │                                │
+  │           RootLayout query ◄───┤
+  │           getAppearanceConfig()│
+  │                                │
+  │           Inyecta en <html>    │
+  │           style="             │
+  │             --bg-primary:#2a2d35;
+  │           "                    │
+  │                                │
+  │           Componentes usan     │
+  │           bg-[var(--bg-primary)]
+```
+
+---
+
+#### 6. PREGUNTAS PARA RODOLFO
+
+1. **Prioridad**: Esto es para ahora o para despues del lanzamiento?
+
+2. **Alcance**: Solo colores o tambien tipografia?
+
+3. **Admin panel incluido**: Tambien quieres que Karen pueda cambiar colores del admin o solo del frontend publico?
+
+4. **Color picker UI**: Usamos un input type="color" simple o una libreria como react-colorful?
+
+---
+
+**Spec ref**: SPEC-26-01-2026-CMS-ContentManager (Posible REQ-10)
+**Status**: INVESTIGACION COMPLETADA - STANDBY esperando decision de Rodolfo
+
+---
 
 ### 28/01/2026 - SINCRONIZACION spec.md COMPLETADA ✅
 

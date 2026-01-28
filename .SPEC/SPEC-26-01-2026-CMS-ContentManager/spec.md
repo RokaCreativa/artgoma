@@ -296,6 +296,43 @@ model SiteConfig {
 
 ---
 
+### REQ-10: Appearance Config (Fonts + Colores) [MVP] (NUEVO)
+**Descripción**: Sistema configurable de tipografías y colores desde admin panel
+**Fecha creación**: 28/01/2026
+**Motivación**: 92+ colores hardcodeados en código, font única no transmite lujo artístico
+
+**Criterios de aceptación**:
+- [x] Colores hardcoded migrados a CSS variables ✅ (Tarea 5.1 - Agente Opus)
+- [x] Font Display (serif) agregada para títulos ✅ (Tarea 5.2 - Cormorant Garamond)
+- [x] Admin panel grupo "Appearance" con: ✅ (Tarea 5.3)
+  - [x] Color pickers para bg_primary, bg_surface, bg_input, accent_color, bg_footer ✅
+  - [x] Dropdown para font_display (Cormorant/Playfair/DM Serif) ✅
+  - [x] Dropdown para font_body (Montserrat/Inter/Roboto) ✅
+- [x] RootLayout inyecta CSS variables desde BD en runtime ✅ (Tarea 5.4)
+- [x] Seed con valores actuales como default ✅ (7 configs appearance en BD)
+- [x] Cache invalidation para appearance configs ✅ (revalidateTag("appearance"))
+
+**Colores a configurar**:
+- `bg_primary`: #1c1f24 (39 ocurrencias)
+- `bg_surface`: #2a2d35 (13 ocurrencias)
+- `bg_input`: #0f1115 (15 ocurrencias)
+- `accent_color`: #dc2626 (rojo ArtGoMA)
+- `bg_footer`: #000000 (footer)
+
+**Fonts a configurar**:
+- Display (títulos H1/H2): Cormorant Garamond, Playfair Display, DM Serif Display
+- Body (textos/UI): Montserrat, Inter, Roboto
+
+**Beneficios**:
+- ✅ Karen cambia colores sin Rodolfo
+- ✅ Tipografía más sofisticada y artística
+- ✅ Reutilizable para otros proyectos
+- ✅ Preview inmediato de cambios
+
+**🔗 Implementation**: tasks.md Fase 5
+
+---
+
 ## 📁 FILE STRUCTURE (🔴 MANTENER ACTUALIZADA)
 
 **Last Updated:** 28/01/2026 - Sincronizado con work_prepend.md

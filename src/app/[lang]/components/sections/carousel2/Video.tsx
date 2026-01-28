@@ -81,7 +81,10 @@ const Video = ({
           >
             <source src={historie.url} type="video/mp4" />
           </video>
-          <button onClick={handlePlayPause} className="absolute bottom-4 right-4 bg-black/50 p-2 rounded-full z-[300]">
+          <button
+            onClick={handlePlayPause}
+            className="absolute bottom-4 right-4 bg-black/50 p-2 rounded-full z-[300] opacity-0 hover:opacity-100 transition-opacity duration-300"
+          >
             {isPlaying ? <Pause stroke="white" /> : <Play stroke="white" />}
           </button>
         </div>

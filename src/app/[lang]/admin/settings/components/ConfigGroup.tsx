@@ -25,6 +25,7 @@ import {
   Phone,
   Share2,
   FileText,
+  Palette,
   LucideIcon,
 } from "lucide-react";
 import { upsertConfig } from "@/actions/cms/config";
@@ -41,6 +42,7 @@ const iconMap: Record<string, LucideIcon> = {
   phone: Phone,
   share2: Share2,
   fileText: FileText,
+  palette: Palette,
 };
 
 interface ConfigGroupProps {
@@ -53,14 +55,18 @@ interface ConfigGroupProps {
 interface ConfigItem {
   key: string;
   label: string;
-  type: "text" | "url" | "email" | "phone";
+  type: "text" | "url" | "email" | "phone" | "color" | "select";
   value: string;
   placeholder?: string;
+  options?: Array<{ value: string; label: string }>;
 }
 
 interface SaveState {
   [key: string]: "idle" | "saving" | "saved" | "error";
 }
+
+// Regex para validar colores hex
+const HEX_COLOR_REGEX = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 
 // Validaciones por tipo
 const validateByType = (
@@ -100,6 +106,15 @@ const validateByType = (
       if (!phoneRegex.test(value)) {
         return { valid: false, error: "Telefono no valido" };
       }
+      break;
+    case "color":
+      // Validar formato hex color (#RRGGBB o #RGB)
+      if (!HEX_COLOR_REGEX.test(value)) {
+        return { valid: false, error: "Color hex no valido (ej: #dc2626)" };
+      }
+      break;
+    case "select":
+      // Los selects no requieren validacion especial
       break;
   }
 
@@ -180,6 +195,8 @@ export default function ConfigGroup({
         return "url";
       case "phone":
         return "tel";
+      case "color":
+        return "color";
       default:
         return "text";
     }
@@ -241,27 +258,87 @@ export default function ConfigGroup({
                 </label>
                 <div className="flex gap-2">
                   <div className="flex-1 relative">
-                    <input
-                      type={getInputType(config.type)}
-                      value={values[config.key]}
-                      onChange={(e) =>
-                        handleChange(config.key, e.target.value, config.type)
-                      }
-                      placeholder={
-                        config.placeholder ||
-                        getPlaceholder(config.type, config.label)
-                      }
-                      className={cn(
-                        "w-full bg-[#2a2d35] border rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors",
-                        error
-                          ? "border-red-500 focus:ring-red-500/50"
-                          : "border-gray-700 focus:ring-red-500/50 focus:border-red-500",
-                      )}
-                    />
-                    {error && (
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <AlertCircle className="w-4 h-4 text-red-500" />
+                    {/* Renderizado condicional segun tipo */}
+                    {config.type === "color" ? (
+                      // Color picker con preview
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-12 h-10 rounded-lg border border-gray-700 flex-shrink-0"
+                          style={{ backgroundColor: values[config.key] || "#000000" }}
+                        />
+                        <input
+                          type="color"
+                          value={values[config.key] || "#000000"}
+                          onChange={(e) =>
+                            handleChange(config.key, e.target.value, config.type)
+                          }
+                          className="w-16 h-10 cursor-pointer bg-transparent border-0"
+                        />
+                        <input
+                          type="text"
+                          value={values[config.key]}
+                          onChange={(e) =>
+                            handleChange(config.key, e.target.value, config.type)
+                          }
+                          placeholder={config.placeholder || "#000000"}
+                          className={cn(
+                            "flex-1 bg-[#2a2d35] border rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors font-mono text-sm",
+                            error
+                              ? "border-red-500 focus:ring-red-500/50"
+                              : "border-gray-700 focus:ring-red-500/50 focus:border-red-500",
+                          )}
+                        />
                       </div>
+                    ) : config.type === "select" && config.options ? (
+                      // Dropdown select
+                      <select
+                        value={values[config.key]}
+                        onChange={(e) =>
+                          handleChange(config.key, e.target.value, config.type)
+                        }
+                        className={cn(
+                          "w-full bg-[#2a2d35] border rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 transition-colors cursor-pointer",
+                          error
+                            ? "border-red-500 focus:ring-red-500/50"
+                            : "border-gray-700 focus:ring-red-500/50 focus:border-red-500",
+                        )}
+                      >
+                        {config.options.map((option) => (
+                          <option
+                            key={option.value}
+                            value={option.value}
+                            className="bg-[#1c1f24]"
+                          >
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      // Input estandar (text, email, url, phone)
+                      <>
+                        <input
+                          type={getInputType(config.type)}
+                          value={values[config.key]}
+                          onChange={(e) =>
+                            handleChange(config.key, e.target.value, config.type)
+                          }
+                          placeholder={
+                            config.placeholder ||
+                            getPlaceholder(config.type, config.label)
+                          }
+                          className={cn(
+                            "w-full bg-[#2a2d35] border rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors",
+                            error
+                              ? "border-red-500 focus:ring-red-500/50"
+                              : "border-gray-700 focus:ring-red-500/50 focus:border-red-500",
+                          )}
+                        />
+                        {error && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <AlertCircle className="w-4 h-4 text-red-500" />
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                   <button

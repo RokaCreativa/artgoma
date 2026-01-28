@@ -20,15 +20,18 @@ import type { ISiteConfig, ConfigMap } from "@/lib/cms/configConstants";
 // ============================================
 
 const ConfigGroupSchema = z.enum(
-  ["contact", "social", "footer", "meta", "general"],
+  ["appearance", "contact", "social", "footer", "meta", "general"],
   {
     errorMap: () => ({ message: "Grupo no válido" }),
   },
 );
 
-const ConfigTypeSchema = z.enum(["text", "url", "email", "phone", "image"], {
-  errorMap: () => ({ message: "Tipo no válido" }),
-});
+const ConfigTypeSchema = z.enum(
+  ["text", "url", "email", "phone", "image", "color", "select"],
+  {
+    errorMap: () => ({ message: "Tipo no válido" }),
+  },
+);
 
 const ConfigKeySchema = z
   .string()
@@ -284,8 +287,10 @@ export async function upsertConfig(
       },
     });
 
-    revalidateTag("cms-config", "max");
-    revalidateTag("site-config", "max");
+    // Invalidar todos los caches relacionados
+    revalidateTag("cms-config");
+    revalidateTag("site-config");
+    revalidateTag("appearance"); // Para appearance configs
     revalidatePath("/admin/settings");
 
     return { success: true, data: result };
@@ -326,8 +331,10 @@ export async function deleteConfig(id: number): Promise<{
       where: { id: validated.data.id },
     });
 
-    revalidateTag("cms-config", "max");
-    revalidateTag("site-config", "max");
+    // Invalidar todos los caches relacionados
+    revalidateTag("cms-config");
+    revalidateTag("site-config");
+    revalidateTag("appearance");
     revalidatePath("/admin/settings");
 
     return {
@@ -426,8 +433,10 @@ export async function upsertConfigBatch(
       }
     });
 
-    revalidateTag("cms-config", "max");
-    revalidateTag("site-config", "max");
+    // Invalidar todos los caches relacionados
+    revalidateTag("cms-config");
+    revalidateTag("site-config");
+    revalidateTag("appearance");
     revalidatePath("/admin/settings");
 
     return {

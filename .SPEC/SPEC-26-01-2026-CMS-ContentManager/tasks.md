@@ -14,10 +14,11 @@
 | 1 | MVP Sliders + YouTube | ✅ | 8/8 + 9 fixes |
 | 2 | Textos Multiidioma | ✅ | 5/5 + 1 fix cache |
 | 3 | Config Sitio | ✅ | 4/4 |
+| 5 | Appearance Config | ✅ | 4/4 |
 | 4 | Polish & Template | ⬜ | 0/3 |
 
-**Total**: 17/20 tareas principales + 10 fixes/mejoras (27-28/01/2026)
-**Estado**: Pendiente verificacion de Rodolfo antes de marcar 100%
+**Total**: 21/24 tareas principales (88%) + 12 fixes/mejoras (27-28/01/2026)
+**Estado**: Fase 5 completada por 4 agentes Opus en paralelo (28/01/2026)
 
 **BONUS**: Seed de Sliders creado (seed-sliders.ts) con datos de:
 - histories.json (12 videos stories + 2 YouTube)
@@ -533,6 +534,146 @@ VIDEO_ID directo ✅
 
 **🔗 Spec ref**: REQ-04
 **📊 Status**: work_prepend.md → 26/01/2026 22:00
+
+---
+
+## 🎨 FASE 5: APPEARANCE CONFIG [MVP]
+
+> **Objetivo**: Sistema configurable de fonts y colores desde admin panel
+> **Estimación total**: 5 horas (paralelo con agentes)
+> **🔗 Spec ref**: REQ-09 (nuevo)
+> **Fecha creación**: 28/01/2026
+
+### Problema Detectado:
+- **92+ colores hardcodeados** en 30+ archivos (`bg-[#1c1f24]`, `bg-[#0f1115]`, etc)
+- **Font única**: Montserrat sin weights, no transmite lujo artístico
+- **Variables CSS existen** pero NO se usan (shadcn/ui en globals.css)
+- **Karen no puede cambiar apariencia** sin tocar código
+
+### 5.1 ✅ Migración Colores a CSS Variables [B] ⏱️ 1.5h
+**Descripción**: Convertir colores hardcoded a variables CSS configurables
+**Archivos**:
+- `src/app/[lang]/globals.css` (agregar variables custom)
+- 30+ componentes con colores hardcoded
+
+**Subtareas**:
+- [ ] Agregar variables CSS en globals.css:
+  - `--artgoma-bg-primary` (#1c1f24)
+  - `--artgoma-bg-surface` (#2a2d35)
+  - `--artgoma-bg-input` (#0f1115)
+  - `--artgoma-accent` (#dc2626)
+  - `--artgoma-bg-footer` (#000000)
+- [ ] Buscar/reemplazar en componentes frontend: `bg-[#1c1f24]` → `bg-artgoma-primary`
+- [ ] Buscar/reemplazar en admin panel: `bg-[#0f1115]` → `bg-artgoma-input`
+- [ ] Agregar clases Tailwind para las variables en tailwind.config.ts
+- [ ] Verificar que todo se ve igual después del cambio
+
+**Impacto**: 39 + 15 + 13 = 67 ocurrencias mínimo
+
+---
+
+### 5.2 ✅ Sistema de Fonts Configurables [MVP] ⏱️ 1.5h
+**Descripción**: Agregar font Display para títulos + sistema de configuración
+**Archivos**:
+- `src/app/[lang]/layout.tsx` (imports fonts) ✅
+- `tailwind.config.ts` (font families) ✅
+- Componentes con títulos H1/H2 ✅
+
+**Subtareas**:
+- [x] Importar Cormorant Garamond (Display serif) de Google Fonts ✅
+- [x] Configurar weights: 400, 600, 700 ✅
+- [x] Agregar CSS variables: `--font-display`, `--font-sans` ✅
+- [x] Extender Tailwind: `font-display` y `font-sans` ✅
+- [x] Aplicar `font-display` a todos los H1/H2 principales ✅ (6 componentes)
+- [x] Mantener Montserrat para body/UI ✅
+- [ ] Verificar que mejora la estética (pendiente Rodolfo)
+
+**Fonts implementadas**:
+- Display (títulos): Cormorant Garamond (weights: 400, 600, 700)
+- Sans (body): Montserrat (weights: 400, 500, 600, 700)
+
+**Componentes actualizados con font-display**:
+- H1hero.tsx (Hero principal)
+- H1Carousel.tsx (DISFRUTA EN VIVO)
+- H2Connect.tsx (CONNECT)
+- H2GetInTouch.tsx (GET IN TOUCH)
+- H2GetInspired.tsx (GET INSPIRED)
+- H2Location.tsx (OUR LOCATION)
+
+**🔗 Spec ref**: REQ-10 (Appearance Config)
+**📊 Status**: work_prepend.md → 28/01/2026
+
+---
+
+### 5.3 ✅ Admin UI - Appearance Settings [MVP] ⏱️ 1.5h
+**Descripción**: Panel admin para configurar apariencia del sitio
+**Archivos**:
+- `src/actions/cms/config.ts` (grupo "appearance" agregado) ✅
+- `src/app/[lang]/admin/settings/page.tsx` (nuevo grupo) ✅
+- `src/lib/cms/configConstants.ts` (nuevas keys + FONT_OPTIONS) ✅
+- `src/app/[lang]/admin/settings/components/ConfigGroup.tsx` (soporte color/select) ✅
+
+**Subtareas**:
+- [x] Agregar grupo `appearance` a CONFIG_GROUPS ✅ (28/01/2026)
+- [x] Agregar configs predefinidas: ✅ (28/01/2026)
+  - `bg_primary` (hex color) - #1c1f24
+  - `bg_surface` (hex color) - #2a2d35
+  - `bg_input` (hex color) - #0f1115
+  - `accent_color` (hex color) - #dc2626
+  - `bg_footer` (hex color) - #000000
+  - `font_display` (dropdown: Cormorant/Playfair/DM Serif)
+  - `font_body` (dropdown: Montserrat/Inter/Roboto)
+- [x] UI en admin/settings con: ✅ (28/01/2026)
+  - Color pickers nativos (input type="color") con preview visual
+  - Input texto hex manual con validacion
+  - Dropdowns para fonts con opciones predefinidas
+- [x] Validación: hex colors con regex ✅ (28/01/2026)
+- [x] Nuevos tipos CONFIG_TYPES: "color" y "select" ✅ (28/01/2026)
+- [x] FONT_OPTIONS exportado para reuso ✅ (28/01/2026)
+- [x] Icono "Palette" agregado al mapa de iconos ✅ (28/01/2026)
+
+**Características implementadas:**
+- Grupo "Apariencia" aparece primero en Settings
+- 5 color pickers con preview visual + input hex manual
+- 2 dropdowns para fonts (Display: 3 opciones, Body: 3 opciones)
+- Validacion regex para colores hex (#RGB o #RRGGBB)
+- Misma UX que otros grupos (colapsable, feedback guardado)
+
+**🔗 Spec ref**: REQ-10 (Appearance Config)
+**📊 Status**: work_prepend.md → 28/01/2026
+
+---
+
+### 5.4 ✅ Integración Frontend - CSS Variables Dinámicas [B] ⏱️ 1h
+**Descripción**: Inyectar configs de BD como CSS variables en runtime
+**Archivos**:
+- `src/app/[lang]/layout.tsx` (inyectar style tag) ✅
+- `src/queries/cms/getSiteConfig.ts` (query appearance configs) ✅
+- `src/lib/cms/appearanceUtils.ts` (nuevo - helpers) ✅
+
+**Subtareas**:
+- [x] Query configs del grupo "appearance" en RootLayout ✅ (getAppearanceConfigs)
+- [x] Generar CSS string con variables custom ✅ (generateAppearanceCSS)
+- [x] Inyectar `<style>` tag en `<html>` con las variables ✅ (dangerouslySetInnerHTML)
+- [x] Cargar fonts dinámicamente según config ✅ (generateGoogleFontsURL + link tags)
+- [x] Cache de 300s para appearance configs ✅ (unstable_cache con tag "appearance")
+- [x] Fallback a valores default si BD vacía ✅ (DEFAULT_APPEARANCE)
+- [x] Seed inicial con valores actuales ✅ (seed-config.ts + configConstants.ts)
+
+**Ejemplo de inyección**:
+```tsx
+<html>
+  <head>
+    <style dangerouslySetInnerHTML={{ __html: `
+      :root {
+        --artgoma-bg-primary: ${bgPrimary};
+        --artgoma-accent: ${accentColor};
+        --font-display: ${fontDisplay}, serif;
+      }
+    `}} />
+  </head>
+</html>
+```
 
 ---
 

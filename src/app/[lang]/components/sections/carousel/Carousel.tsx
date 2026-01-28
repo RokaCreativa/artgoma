@@ -66,7 +66,7 @@ const Carousel = async () => {
   }
 
   return (
-    <div id="enjoy-live" className="py-8 bg-[#1c1f24]">
+    <div id="enjoy-live" className="py-8 bg-artgoma-primary">
       <div className="flex justify-center my-8 md:my-10 px-6">
         <H1Carousel />
       </div>

@@ -6,6 +6,10 @@ const config = {
 	content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
 	prefix: "",
 	theme: {
+		fontFamily: {
+			sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+			display: ['var(--font-display)', 'Georgia', 'serif'],
+		},
 		backgroundSize: {
 			auto: 'auto',
 			cover: 'cover',
@@ -68,6 +72,14 @@ const config = {
 					'3': 'hsl(var(--chart-3))',
 					'4': 'hsl(var(--chart-4))',
 					'5': 'hsl(var(--chart-5))'
+				},
+				// ArtGoMA Custom Colors - SPEC-26-01-2026-CMS-ContentManager Fase 5
+				artgoma: {
+					primary: 'var(--artgoma-bg-primary)',
+					surface: 'var(--artgoma-bg-surface)',
+					input: 'var(--artgoma-bg-input)',
+					accent: 'var(--artgoma-accent)',
+					footer: 'var(--artgoma-bg-footer)'
 				}
 			},
 			borderRadius: {

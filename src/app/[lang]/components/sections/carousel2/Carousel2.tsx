@@ -85,7 +85,7 @@ const Carousel2 = async () => {
   return (
     <div
       id="stories"
-      className="overflow-x-hidden bg-[#1c1f24] py-20 px-10 lg:px-20 md:pt-40"
+      className="overflow-x-hidden bg-artgoma-primary py-20 px-10 lg:px-20 md:pt-40"
     >
       <EmblaCarousel2 slides={slides} options={OPTIONS} />
     </div>

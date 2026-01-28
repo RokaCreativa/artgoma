@@ -52,7 +52,7 @@ const GetInTouch = async ({ lang }: { lang: Locale }) => {
   };
 
   return (
-    <div className="bg-[#1c1f24] pb-16">
+    <div className="bg-artgoma-primary pb-16">
       <div className="flex justify-end px-10 lg:px-32">
         <H2GetInTouch text={getInTouch.h1} />
       </div>

@@ -7,6 +7,7 @@
  * Grupos de configuración predefinidos
  */
 export const CONFIG_GROUPS = {
+  appearance: "appearance", // bg_primary, bg_surface, bg_input, accent_color, font_display, font_body
   contact: "contact", // phone, email, address, whatsapp
   social: "social", // facebook, instagram, youtube, twitter, linkedin, tiktok
   footer: "footer", // copyright, year
@@ -23,16 +24,43 @@ export const CONFIG_TYPES = {
   email: "email",
   phone: "phone",
   image: "image",
+  color: "color", // Hex color picker
+  select: "select", // Dropdown select
 } as const;
 
 /**
  * Keys predefinidas por grupo (para referencia y validación)
  */
 export const PREDEFINED_KEYS = {
+  appearance: [
+    "bg_primary",
+    "bg_surface",
+    "bg_input",
+    "accent_color",
+    "bg_footer",
+    "font_display",
+    "font_body",
+  ],
   contact: ["phone", "email", "address", "whatsapp", "maps_link"],
   social: ["facebook", "instagram", "youtube", "twitter", "linkedin", "tiktok"],
   footer: ["copyright", "year", "website", "company_name"],
   meta: ["site_title", "site_description", "og_image", "site_url"],
+} as const;
+
+/**
+ * Opciones para dropdowns de fonts
+ */
+export const FONT_OPTIONS = {
+  display: [
+    { value: "Cormorant Garamond", label: "Cormorant Garamond" },
+    { value: "Playfair Display", label: "Playfair Display" },
+    { value: "DM Serif Display", label: "DM Serif Display" },
+  ],
+  body: [
+    { value: "Montserrat", label: "Montserrat" },
+    { value: "Inter", label: "Inter" },
+    { value: "Roboto", label: "Roboto" },
+  ],
 } as const;
 
 /**
@@ -46,6 +74,56 @@ export const PREDEFINED_CONFIGS: Array<{
   group: string;
   label: string;
 }> = [
+  // Appearance (colores y fuentes)
+  {
+    key: "bg_primary",
+    value: "#1c1f24",
+    type: "color",
+    group: "appearance",
+    label: "Color de Fondo Principal",
+  },
+  {
+    key: "bg_surface",
+    value: "#2a2d35",
+    type: "color",
+    group: "appearance",
+    label: "Color de Superficies",
+  },
+  {
+    key: "bg_input",
+    value: "#0f1115",
+    type: "color",
+    group: "appearance",
+    label: "Color de Inputs",
+  },
+  {
+    key: "accent_color",
+    value: "#dc2626",
+    type: "color",
+    group: "appearance",
+    label: "Color de Acento",
+  },
+  {
+    key: "bg_footer",
+    value: "#000000",
+    type: "color",
+    group: "appearance",
+    label: "Color del Footer",
+  },
+  {
+    key: "font_display",
+    value: "Cormorant Garamond",
+    type: "select",
+    group: "appearance",
+    label: "Fuente de Titulos",
+  },
+  {
+    key: "font_body",
+    value: "Montserrat",
+    type: "select",
+    group: "appearance",
+    label: "Fuente de Textos",
+  },
   // Contacto
   {
     key: "phone",
