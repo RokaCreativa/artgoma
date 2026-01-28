@@ -284,8 +284,8 @@ export async function upsertConfig(
       },
     });
 
-    revalidateTag("cms-config");
-    revalidateTag("site-config");
+    revalidateTag("cms-config", "max");
+    revalidateTag("site-config", "max");
     revalidatePath("/admin/settings");
 
     return { success: true, data: result };
@@ -326,8 +326,8 @@ export async function deleteConfig(id: number): Promise<{
       where: { id: validated.data.id },
     });
 
-    revalidateTag("cms-config");
-    revalidateTag("site-config");
+    revalidateTag("cms-config", "max");
+    revalidateTag("site-config", "max");
     revalidatePath("/admin/settings");
 
     return {
@@ -426,8 +426,8 @@ export async function upsertConfigBatch(
       }
     });
 
-    revalidateTag("cms-config");
-    revalidateTag("site-config");
+    revalidateTag("cms-config", "max");
+    revalidateTag("site-config", "max");
     revalidatePath("/admin/settings");
 
     return {
