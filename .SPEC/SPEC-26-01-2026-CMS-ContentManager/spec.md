@@ -2,10 +2,11 @@
 
 ## 📋 METADATA
 - **Nombre**: CMS Content Manager para ArtGoMA
-- **Versión**: 1.0
-- **Fecha**: 26/01/2026
+- **Versión**: 1.1
+- **Fecha creación**: 26/01/2026
+- **Última actualización**: 28/01/2026
 - **Autor**: Rodolfo + Claude
-- **Estado**: 🔄 En desarrollo
+- **Estado**: ✅ Fases 1-3 COMPLETADAS (85%) - Solo falta Fase 4 Polish
 
 ---
 
@@ -163,12 +164,12 @@ model SiteConfig {
 ### REQ-01: Sistema de Sliders Dinámicos [MVP]
 **Descripción**: CRUD completo para gestionar sliders y sus items
 **Criterios de aceptación**:
-- [ ] Crear/Editar/Eliminar sliders
-- [ ] Drag & drop para reordenar items
-- [ ] Soporte para YouTube (solo pegar URL/ID)
-- [ ] Soporte para imágenes (URL o upload a Supabase)
-- [ ] Preview en tiempo real
-- [ ] Activar/Desactivar items sin eliminar
+- [x] Crear/Editar/Eliminar sliders ✅ (slider.ts + SliderCard + CreateSliderDialog)
+- [x] Drag & drop para reordenar items ✅ (SliderItemsList.tsx con HTML5 nativo)
+- [x] Soporte para YouTube (solo pegar URL/ID) ✅ (youtube.ts + AddItemDialog)
+- [x] Soporte para imágenes (URL o upload a Supabase) ✅ (AddItemDialog + EditItemDialog)
+- [x] Preview en tiempo real ✅ (thumbnails en dialogs)
+- [x] Activar/Desactivar items sin eliminar ✅ (toggle con rollback - 28/01/2026)
 
 **🔗 Implementation**: tasks.md Fase 1
 
@@ -177,11 +178,11 @@ model SiteConfig {
 ### REQ-02: Integración YouTube [MVP]
 **Descripción**: Videos desde YouTube en lugar de Supabase storage
 **Criterios de aceptación**:
-- [ ] Pegar URL de YouTube → extrae ID automáticamente
-- [ ] Preview del video en el admin
-- [ ] Soporte para videos unlisted
-- [ ] Thumbnail automático desde YouTube
-- [ ] Embed responsive en frontend
+- [x] Pegar URL de YouTube → extrae ID automáticamente ✅ (youtube.ts extractYouTubeId)
+- [x] Preview del video en el admin ✅ (thumbnail en AddItemDialog/EditItemDialog)
+- [x] Soporte para videos unlisted ✅ (funciona con cualquier ID válido)
+- [x] Thumbnail automático desde YouTube ✅ (getYouTubeThumbnail)
+- [x] Embed responsive en frontend ✅ (YouTubeEmbed.tsx con lite mode)
 
 **Beneficios**:
 - ✅ CDN global gratis (YouTube)
@@ -196,11 +197,11 @@ model SiteConfig {
 ### REQ-03: Gestión de Textos Multiidioma [MVP]
 **Descripción**: Editar textos de secciones en todos los idiomas
 **Criterios de aceptación**:
-- [ ] Editor para cada sección (hero, connect, inspire, etc.)
-- [ ] Tabs o selector de idioma (ES, EN, DE, FR, IT, RU)
-- [ ] Campos según estructura actual (h1, h2, paragraphs, buttons)
-- [ ] Preview del texto formateado
-- [ ] Fallback a español si no existe traducción
+- [x] Editor para cada sección (hero, connect, inspire, etc.) ✅ (ContentEditorClient + SectionEditor)
+- [x] Tabs o selector de idioma (ES, EN, DE, FR, IT, RU) ✅ (LocaleTabs.tsx)
+- [x] Campos según estructura actual (h1, h2, paragraphs, buttons) ✅ (sectionSchemas.ts)
+- [ ] Preview del texto formateado (pendiente - mejora futura)
+- [x] Fallback a español si no existe traducción ✅ (dictionary.ts merge con JSON)
 
 **🔗 Implementation**: tasks.md Fase 2
 
@@ -209,10 +210,10 @@ model SiteConfig {
 ### REQ-04: Configuración del Sitio [MVP]
 **Descripción**: Gestionar contacto, footer y redes sociales
 **Criterios de aceptación**:
-- [ ] Editar teléfono, email, dirección
-- [ ] Editar links de redes sociales
-- [ ] Editar copyright/año del footer
-- [ ] Agrupación lógica en el admin (Contacto, Redes, Footer)
+- [x] Editar teléfono, email, dirección ✅ (ConfigGroup.tsx + config.ts)
+- [x] Editar links de redes sociales ✅ (facebook, instagram, youtube, twitter)
+- [x] Editar copyright/año del footer ✅ (grupo footer en settings)
+- [x] Agrupación lógica en el admin (Contacto, Redes, Footer) ✅ (3 grupos colapsables)
 
 **🔗 Implementation**: tasks.md Fase 3
 
@@ -221,13 +222,13 @@ model SiteConfig {
 ### REQ-05: UI/UX del Panel Admin [MVP]
 **Descripción**: Interfaz bonita, moderna y usable
 **Criterios de aceptación**:
-- [ ] Design system consistente (colores ArtGoMA: rojo, negro, blanco)
-- [ ] Responsive (funciona en tablet/móvil)
-- [ ] Feedback visual en acciones (loading, success, error)
-- [ ] Navegación clara entre módulos
-- [ ] Iconografía consistente (Lucide icons)
+- [x] Design system consistente (colores ArtGoMA: rojo, negro, blanco) ✅ (#1c1f24, #2a2d35, #dc2626)
+- [ ] Responsive (funciona en tablet/móvil) (pendiente - sidebar colapsable)
+- [x] Feedback visual en acciones (loading, success, error) ✅ (estados en todos los forms)
+- [x] Navegación clara entre módulos ✅ (Sidebar.tsx con iconos)
+- [x] Iconografía consistente (Lucide icons) ✅ (usado en todo el admin)
 
-**Inspiración**: 
+**Inspiración**:
 - Notion (simplicidad)
 - Linear (estética)
 - NO WordPress (complejidad innecesaria)
@@ -239,11 +240,11 @@ model SiteConfig {
 ### REQ-06: Autenticación Temporal [MVP]
 **Descripción**: Login hardcodeado para fase inicial
 **Criterios de aceptación**:
-- [ ] Ruta `/admin` protegida
-- [ ] Login con email: `kl@roka.es` y password: `Test1234`
-- [ ] Middleware que verifica sesión
-- [ ] Logout funcional
-- [ ] Redirect a login si no autenticado
+- [x] Ruta `/admin` protegida ✅ (layout.tsx con auth check)
+- [x] Login con email: `kl@roka.es` y password: `Test1234` ✅ (auth.ts)
+- [ ] Middleware que verifica sesión (opcional - ya hay check en layout)
+- [x] Logout funcional ✅ (Header.tsx + actions/auth.ts)
+- [x] Redirect a login si no autenticado ✅ (layout.tsx redirect)
 
 **Nota**: Después se integrará con NextAuth cuando esté todo probado
 
@@ -258,29 +259,46 @@ model SiteConfig {
 - [x] Carousel de artistas usa datos de BD ✅ ArtistsCarousel
 - [x] Carousel de brands usa datos de BD ✅ LogoCarousel
 - [x] Carousel de live usa datos de BD ✅ Carousel (sections)
-- [ ] Textos de secciones vienen de BD (con fallback a JSON)
-- [ ] Contacto/Footer desde SiteConfig
-- [x] Cache con revalidación (ISR o similar) ✅ unstable_cache 60s/300s
+- [x] Hero Carousel usa datos de BD ✅ HeroCarousel (27/01/2026)
+- [x] Golden Tickets carousel usa datos de BD ✅ GoldenTicketsCarousel (27/01/2026)
+- [x] Textos de secciones vienen de BD (con fallback a JSON) ✅ dictionary.ts (26/01/2026)
+- [x] Contacto/Footer desde SiteConfig ✅ Footer.tsx + GetInTouch.tsx (26/01/2026)
+- [x] Cache con revalidación (ISR o similar) ✅ unstable_cache 60s/300s + revalidateTag
 
-**🔗 Implementation**: tasks.md Fase 1.9 (completado carousels)
+**🔗 Implementation**: tasks.md Fase 1.9, 2.4, 3.3
 
 ---
 
 ### REQ-08: Arquitectura Template-Ready [OPT]
 **Descripción**: Diseño reutilizable para otros proyectos
 **Criterios de aceptación**:
-- [ ] Schema de BD genérico (section, sectionKey, etc.)
-- [ ] Componentes admin desacoplados
-- [ ] Configuración por variables de entorno
-- [ ] Documentación de cómo reutilizar
+- [x] Schema de BD genérico (section, sectionKey, etc.) ✅ (Slider, SliderItem, SectionContent, SiteConfig)
+- [ ] Componentes admin desacoplados (pendiente refactor)
+- [ ] Configuración por variables de entorno (pendiente)
+- [ ] Documentación de cómo reutilizar (pendiente)
 
 **🔗 Implementation**: tasks.md Fase 4
 
 ---
 
+### REQ-09: Upload de Imágenes a Supabase [MVP] (NUEVO)
+**Descripción**: Subir imágenes directamente desde el admin a Supabase Storage
+**Criterios de aceptación**:
+- [x] AddItemDialog permite subir imagen nueva ✅ (tabs URL/Upload - 27/01/2026)
+- [x] EditItemDialog permite subir imagen nueva ✅ (sección "o subir nueva" - 27/01/2026)
+- [x] Validación de tipo (PNG/JPG/WebP) ✅ (client-side)
+- [x] Validación de tamaño (max 4-5MB) ✅ (client-side)
+- [x] Preview local antes de subir ✅ (objectURL)
+- [x] API endpoint funcional ✅ (/api/upload-images con bucket: events)
+- [x] Cache invalidation después de agregar items ✅ (revalidateTag("sliders") - 28/01/2026)
+
+**🔗 Implementation**: tasks.md (no estaba planificado, fue feature emergente)
+
+---
+
 ## 📁 FILE STRUCTURE (🔴 MANTENER ACTUALIZADA)
 
-**Last Updated:** 26/01/2026 21:00
+**Last Updated:** 28/01/2026 - Sincronizado con work_prepend.md
 
 ### ✅ Ya Creados:
 
@@ -289,37 +307,63 @@ src/
 ├── lib/
 │   └── cms/
 │       ├── youtube.ts                ✅ Utilidades YouTube (extraer ID, thumbnail, embed)
-│       └── auth.ts                   ✅ Auth temporal (kl@roka.es / Test1234)
+│       ├── auth.ts                   ✅ Auth temporal (kl@roka.es / Test1234)
+│       └── sectionSchemas.ts         ✅ Schemas Zod + tipos (10 secciones)
 │
 ├── actions/
 │   └── cms/
 │       ├── auth.ts                   ✅ Server actions login/logout
-│       ├── slider.ts                 ✅ Server actions CRUD sliders completo
-│       ├── content.ts                ✅ Server actions CRUD contenido multiidioma
+│       ├── slider.ts                 ✅ Server actions CRUD sliders + revalidateTag (fix 28/01)
+│       ├── content.ts                ✅ Server actions CRUD contenido + invalidación 3 tags (fix 28/01)
 │       └── config.ts                 ✅ Server actions CRUD config sitio
 │
 ├── queries/
 │   └── cms/
 │       ├── index.ts                  ✅ Barrel export de todas las queries
-│       ├── getSliders.ts             ✅ Queries sliders (cache 60s, tags: cms-sliders)
-│       ├── getSectionContent.ts      ✅ Queries contenido multiidioma (cache 300s, tags: cms-content)
+│       ├── getSliders.ts             ✅ Queries sliders (cache 60s, tags: sliders)
+│       ├── getSectionContent.ts      ✅ Queries contenido (cache 300s, tags: section-content)
 │       └── getSiteConfig.ts          ✅ Queries config sitio (cache 300s, tags: cms-config)
 │
-└── app/
-    └── [lang]/
-        └── admin/
-            ├── layout.tsx            ✅ Layout con auth check
-            ├── page.tsx              ✅ Dashboard con stats
-            ├── login/
-            │   └── page.tsx          ✅ Página login UI
-            ├── components/
-            │   ├── Sidebar.tsx       ✅ Navegación lateral
-            │   └── Header.tsx        ✅ Header con logout
-            └── sliders/
-                ├── page.tsx          ✅ Lista de sliders
-                └── components/
-                    ├── SliderCard.tsx           ✅ Card de slider
-                    └── CreateSliderDialog.tsx   ✅ Dialog crear slider
+├── configs/
+│   └── dictionary.ts                 ✅ getDictionary con BD + fallback JSON (fix 28/01)
+│
+├── app/
+│   ├── api/
+│   │   ├── upload-images/
+│   │   │   └── route.ts              ✅ Upload a Supabase Storage (bucket: events)
+│   │   └── debug-supabase/
+│   │       └── route.ts              ✅ Endpoint temporal debug (27/01)
+│   │
+│   └── [lang]/
+│       └── admin/
+│           ├── layout.tsx            ✅ Layout con auth check
+│           ├── page.tsx              ✅ Dashboard con stats
+│           ├── login/
+│           │   └── page.tsx          ✅ Página login UI
+│           ├── components/
+│           │   ├── Sidebar.tsx       ✅ Navegación lateral
+│           │   └── Header.tsx        ✅ Header con logout
+│           ├── sliders/
+│           │   ├── page.tsx          ✅ Lista de sliders
+│           │   ├── [id]/
+│           │   │   └── page.tsx      ✅ Editor slider con drag&drop
+│           │   └── components/
+│           │       ├── SliderCard.tsx           ✅ Card de slider
+│           │       ├── CreateSliderDialog.tsx   ✅ Dialog crear slider
+│           │       ├── SliderItemsList.tsx      ✅ Lista items drag&drop + toggle rollback
+│           │       ├── AddItemDialog.tsx        ✅ Dialog agregar (YouTube/URL/Upload)
+│           │       ├── EditItemDialog.tsx       ✅ Dialog editar + upload imagen
+│           │       └── SliderSettings.tsx       ✅ Dropdown settings slider
+│           ├── content/
+│           │   ├── page.tsx                     ✅ Editor contenido multiidioma
+│           │   └── components/
+│           │       ├── ContentEditorClient.tsx  ✅ Cliente orquestador
+│           │       ├── LocaleTabs.tsx           ✅ Tabs de idiomas
+│           │       └── SectionEditor.tsx        ✅ Formulario dinámico
+│           └── settings/
+│               ├── page.tsx                     ✅ Configuración sitio
+│               └── components/
+│                   └── ConfigGroup.tsx          ✅ Grupo colapsable
 ```
 
 ### 🔄 Ya Modificados:
@@ -378,17 +422,12 @@ src/app/[lang]/admin/settings/
     └── ConfigGroup.tsx               ✅ Grupo de configs colapsable con validación
 ```
 
-### ⬜ Por Crear:
+### ⬜ Por Crear (Fase 4 - Polish):
 
 ```
-(Fase 3 completada - Solo falta integración con frontend)
-```
-
-### ✅ Ya en lib/cms/:
-
-```
-src/lib/cms/
-└── sectionSchemas.ts                 ✅ Schemas Zod + tipos (10 secciones)
+- Template-ready refactor
+- Preview/Draft mode
+- Testing & QA completo
 ```
 
 ### ✅ Ya Modificados (Fase 1.9 - Integración Frontend Carousels):
@@ -397,28 +436,43 @@ src/lib/cms/
 src/app/[lang]/components/
 ├── YouTubeEmbed.tsx                  ✅ Componente YouTube embed responsive (lite mode)
 ├── sections/
+│   ├── hero/
+│   │   ├── Hero.tsx                  ✅ Modificado para usar HeroCarousel
+│   │   ├── HeroCarousel.tsx          ✅ Server component con getSliderBySection("hero")
+│   │   ├── HeroCarouselClient.tsx    ✅ Cliente con rotación automática 7s
+│   │   └── index.tsx                 ✅ Re-export + tipos
 │   ├── carousel2/
 │   │   ├── Carousel2.tsx             ✅ Server component con getSliderBySection("stories")
 │   │   ├── EmblaCarousel2.tsx        ✅ Soporte YouTube + video MP4
 │   │   └── index.tsx                 ✅ Re-export + tipos
-│   └── carousel/
-│       ├── Carousel.tsx              ✅ Server component con getSliderBySection("live")
-│       ├── EmblaCarousel.tsx         ✅ Actualizado para nuevos tipos
-│       └── index.tsx                 ✅ Re-export + tipos
+│   ├── carousel/
+│   │   ├── Carousel.tsx              ✅ Server component con getSliderBySection("live")
+│   │   ├── EmblaCarousel.tsx         ✅ Actualizado + playOnInit fix (27/01)
+│   │   └── index.tsx                 ✅ Re-export + tipos
+│   ├── footer/
+│   │   └── Footer.tsx                ✅ Async server component + BD (26/01)
+│   └── getInTouch/
+│       └── GetInTouch.tsx            ✅ Usa getContactInfo() + BD (26/01)
 ├── carousel/
 │   ├── index.tsx                     ✅ Re-export LogoCarousel
 │   ├── LogoCarousel.tsx              ✅ Server component con getSliderBySection("brands")
 │   └── LogoCarouselClient.tsx        ✅ Cliente con animación loop
-└── carousel2/
-    ├── ArtistsCarousel.tsx           ✅ Server component con getSliderBySection("artists")
-    └── ArtistsCarouselClient.tsx     ✅ Cliente Embla carousel
+├── carousel2/
+│   ├── ArtistsCarousel.tsx           ✅ Server component con getSliderBySection("artists")
+│   └── ArtistsCarouselClient.tsx     ✅ Cliente Embla carousel
+└── carousel-tickets/
+    ├── index.tsx                     ✅ Re-export (27/01)
+    ├── GoldenTicketsCarousel.tsx     ✅ Server component con getSliderBySection("tickets")
+    └── GoldenTicketsCarouselClient.tsx ✅ Cliente CSS scroll infinito
 ```
 
-**Fallbacks implementados:**
+**Fallbacks implementados (6 carousels):**
+- HeroCarousel (hero) → imgsCarousel.json
 - Carousel2 (stories) → histories.json
-- ArtistsCarousel → imgs-artists.json
+- ArtistsCarousel (artists) → imgs-artists.json
 - LogoCarousel (brands) → useCarouselBrands.js
 - Carousel (live) → slides.json
+- GoldenTicketsCarousel (tickets) → useCarouselGoldenTickets.js
 
 ---
 
@@ -558,12 +612,23 @@ const content = await getSectionContent("hero", lang)
 
 ## 🚀 FASES DE IMPLEMENTACIÓN
 
-| Fase | Contenido | Estimación |
-|------|-----------|------------|
-| **1. MVP Sliders** | DB + Admin Sliders + YouTube | 2-3 días |
-| **2. Textos** | SectionContent + Editor multiidioma | 1-2 días |
-| **3. Config** | SiteConfig + Contacto/Footer | 1 día |
-| **4. Polish** | Template-ready + Docs | 1 día |
+| Fase | Contenido | Estado | Progreso |
+|------|-----------|--------|----------|
+| **1. MVP Sliders** | DB + Admin Sliders + YouTube + Upload | ✅ COMPLETADA | 8/8 |
+| **2. Textos** | SectionContent + Editor multiidioma | ✅ COMPLETADA | 5/5 |
+| **3. Config** | SiteConfig + Contacto/Footer | ✅ COMPLETADA | 4/4 |
+| **4. Polish** | Template-ready + Docs | ⬜ PENDIENTE | 0/3 |
+
+**Total progreso**: 17/20 tareas (85%)
+
+**BONUS implementados** (no planificados):
+- ✅ Hero Carousel integrado con BD
+- ✅ Golden Tickets carousel integrado con BD
+- ✅ Upload de imágenes a Supabase (REQ-09)
+- ✅ Fix AutoScroll "DISFRUTA EN VIVO"
+- ✅ Fix toggle items con rollback
+- ✅ Fix cache invalidation (revalidateTag)
+- ✅ Fix textos multiidioma (28/01/2026)
 
 **🔗 Detalle**: Ver tasks.md para breakdown completo
 

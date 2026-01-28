@@ -2,8 +2,8 @@
 
 ## 📋 METADATA
 - **SPEC**: CMS Content Manager para ArtGoMA
-- **Última actualización**: 26/01/2026 23:00
-- **Estado global**: 🔄 En progreso (Integración Frontend Textos completada)
+- **Última actualización**: 28/01/2026 (Sincronizado con spec.md)
+- **Estado global**: ✅ Fases 1-3 COMPLETADAS (85%) - Solo falta Fase 4 Polish
 
 ---
 
@@ -11,18 +11,32 @@
 
 | Fase | Nombre | Estado | Progreso |
 |------|--------|--------|----------|
-| 1 | MVP Sliders + YouTube | ✅ | 8/8 |
-| 2 | Textos Multiidioma | ✅ | 5/5 |
+| 1 | MVP Sliders + YouTube | ✅ | 8/8 + 9 fixes |
+| 2 | Textos Multiidioma | ✅ | 5/5 + 1 fix cache |
 | 3 | Config Sitio | ✅ | 4/4 |
 | 4 | Polish & Template | ⬜ | 0/3 |
 
-**Total**: 17/20 tareas completadas
+**Total**: 17/20 tareas principales + 10 fixes/mejoras (27-28/01/2026)
+**Estado**: Pendiente verificacion de Rodolfo antes de marcar 100%
 
 **BONUS**: Seed de Sliders creado (seed-sliders.ts) con datos de:
-- histories.json (12 videos stories)
+- histories.json (12 videos stories + 2 YouTube)
 - imgs-artists.json (9 artistas)
 - slides.json (11 items live gallery)
 - useCarouselBrands.js (5 logos unicos)
+- imgsCarousel.json (6 imagenes hero)
+- useCarouselGoldenTickets.js (5 tickets)
+
+**FIXES 27-28/01/2026**:
+- [x] Toggle items slider con rollback (SliderItemsList.tsx)
+- [x] Upload imagenes en AddItemDialog (tabs URL/Upload)
+- [x] Upload imagenes en EditItemDialog (seccion upload)
+- [x] Cache invalidation con revalidateTag("sliders") en slider.ts
+- [x] Cache invalidation textos multiidioma (3 tags: cms-content, section-content, dictionary)
+- [x] AutoScroll carousel "DISFRUTA EN VIVO" (playOnInit: true)
+- [x] Hero Carousel integrado con BD (HeroCarousel.tsx + HeroCarouselClient.tsx)
+- [x] Golden Tickets carousel integrado (GoldenTicketsCarousel.tsx + Client)
+- [x] Migracion BD produccion ejecutada (prisma migrate deploy + seeds)
 
 ---
 
@@ -44,6 +58,7 @@
 - [x] Agregar modelo SiteConfig
 - [x] ✅ Ejecutar `npx prisma migrate deploy` (27/01/2026)
 - [x] Verificar en BD que se crearon las tablas (27/01/2026 - 6 sliders, 48 items)
+- [x] ✅ BD produccion lista (28/01/2026 - 6 sliders, 14 items stories con YouTube)
 
 **🔗 Spec ref**: spec.md → Arquitectura de Base de Datos
 **📊 Status**: work_prepend.md → 26/01/2026 18:30
@@ -155,6 +170,7 @@ VIDEO_ID directo ✅
 - [x] Click en card → navega a editor
 - [x] Toggle activar/desactivar slider
 - [x] Botón eliminar con confirmación
+- [x] Toggle activo/desactivar con rollback en error (28/01/2026)
 - [ ] Empty state bonito si no hay sliders (mejora)
 
 **🔗 Spec ref**: REQ-01, REQ-05
@@ -183,6 +199,9 @@ VIDEO_ID directo ✅
 - [x] Eliminar item con confirmación
 - [x] Optimistic updates en reordenamiento
 - [x] SliderSettings dropdown (editar nombre, toggle, eliminar)
+- [x] Upload imagen directo a Supabase en AddItemDialog (27/01/2026)
+- [x] Upload imagen directo a Supabase en EditItemDialog (27/01/2026)
+- [x] Toggle items con rollback en error + spinner + banner error (28/01/2026)
 
 **Características implementadas:**
 - Drag & drop HTML5 nativo (sin librerías)
@@ -235,6 +254,10 @@ VIDEO_ID directo ✅
 - `src/app/[lang]/components/carousel/LogoCarouselClient.tsx` ✅ (creado)
 - `src/app/[lang]/components/sections/carousel/Carousel.tsx` ✅ (modificado)
 - `src/app/[lang]/components/sections/carousel/EmblaCarousel.tsx` ✅ (modificado)
+- `src/app/[lang]/components/sections/hero/HeroCarousel.tsx` ✅ (creado 27/01)
+- `src/app/[lang]/components/sections/hero/HeroCarouselClient.tsx` ✅ (creado 27/01)
+- `src/app/[lang]/components/carousel-tickets/GoldenTicketsCarousel.tsx` ✅ (creado 27/01)
+- `src/app/[lang]/components/carousel-tickets/GoldenTicketsCarouselClient.tsx` ✅ (creado 27/01)
 
 **Subtareas**:
 - [x] Modificar Carousel2 (videos) para usar getSliderBySection("stories")
@@ -243,6 +266,10 @@ VIDEO_ID directo ✅
 - [x] Modificar LogoCarousel (brands) para usar BD (server + client component)
 - [x] Modificar Carousel (live) para usar BD
 - [x] Fallback a JSON si BD vacía (todos implementados)
+- [x] Hero Carousel integrado con BD (HeroCarousel.tsx + HeroCarouselClient.tsx) (27/01/2026)
+- [x] Golden Tickets carousel integrado (GoldenTicketsCarousel.tsx) (27/01/2026)
+- [x] Fix AutoScroll "DISFRUTA EN VIVO" (playOnInit: true) (27/01/2026)
+- [x] Cache invalidation con revalidateTag("sliders") en todas las mutaciones (28/01/2026)
 - [ ] Verificar que todo renderiza igual (requiere prueba de Rodolfo)
 
 **Características implementadas:**
@@ -359,7 +386,8 @@ VIDEO_ID directo ✅
 - [x] Crear query con cache y fallback a JSON
 - [x] Modificar getDictionary para consultar BD primero
 - [x] Verificar que todas las secciones renderizan (fallback funciona)
-- [ ] Probar cambio desde admin → aparece en frontend (requiere migración)
+- [x] Fix cache invalidation textos (revalidateTag con 3 tags) (28/01/2026)
+- [ ] Probar cambio desde admin → aparece en frontend (pendiente verificación Rodolfo)
 
 **Implementación:**
 - `getDictionary(locale)` ahora consulta `SectionContent` en BD con cache 300s
@@ -569,22 +597,49 @@ VIDEO_ID directo ✅
 ### Orden de Ejecución Recomendado:
 1. ✅ **[B]** 1.1 Schema Prisma (todo depende de esto)
 2. ✅ **[B]** 1.2 Auth temporal (proteger admin)
-3. 🔄 **[MVP]** 1.3 Layout admin (base visual)
+3. ✅ **[MVP]** 1.3 Layout admin (base visual)
 4. ✅ **[MVP]** 1.4 + 1.5 Server actions + YouTube utils (paralelo)
-5. 🔄 **[MVP]** 1.6 + 1.7 UI Sliders (en progreso)
-6. ⬜ **[B]** 1.8 Integración frontend sliders
-7. ⬜ **[MVP]** Fase 2 completa (textos)
-8. ⬜ **[MVP]** Fase 3 completa (config)
+5. ✅ **[MVP]** 1.6 + 1.7 UI Sliders (completado)
+6. ✅ **[B]** 1.8 Integración frontend sliders (completado)
+7. ✅ **[MVP]** Fase 2 completa (textos)
+8. ✅ **[MVP]** Fase 3 completa (config)
 9. ⬜ **[OPT]** Fase 4 si hay tiempo
 
-### Dependencias:
+---
+
+## 🔴 VERIFICACIONES PENDIENTES DE RODOLFO (28/01/2026)
+
+**Antes de marcar como 100% completado, Rodolfo debe verificar:**
+
+### Sliders/Carousels:
+- [ ] Toggle items activo/inactivo funciona en admin
+- [ ] Upload imagen a Supabase funciona en AddItemDialog
+- [ ] Upload imagen a Supabase funciona en EditItemDialog
+- [ ] Nuevas imagenes de Supabase aparecen en frontend (<60s)
+- [ ] Videos YouTube aparecen en carousel stories (items 13-14)
+- [ ] Hero Carousel funciona con imagenes de BD
+- [ ] Golden Tickets carousel funciona
+
+### Textos Multiidioma:
+- [ ] Editar texto en admin → se refleja en frontend
+- [ ] Ver logs en consola: `[getDictionary] locale=es, DB sections=...`
+
+### Config Sitio:
+- [ ] Cambiar telefono/email → se refleja en GetInTouch
+- [ ] Cambiar redes sociales → se refleja en Footer
+
+### General:
+- [ ] Reiniciar dev server despues de fixes de cache
+- [ ] Hard refresh (Ctrl+Shift+R) para limpiar cache navegador
+
+### Dependencias (TODAS COMPLETADAS):
 ```
 1.1 ──► Todo lo demás ✅ DONE
 1.2 ──► 1.3, 1.6, 1.7 ✅ DONE
 1.4 ──► 1.6, 1.7, 1.8 ✅ DONE
 1.5 ──► 1.7, 1.8 ✅ DONE
-2.1 ──► 2.2, 2.4
-3.1 ──► 3.2, 3.3
+2.1 ──► 2.2, 2.4 ✅ DONE
+3.1 ──► 3.2, 3.3 ✅ DONE
 ```
 
 ---
