@@ -44,6 +44,9 @@ const YouTubeEmbed: React.FC<YouTubeEmbedProps> = ({
   thumbnailQuality = "hqdefault",
   liteMode = true,
 }) => {
+  // DEBUG: Verificar youtubeId recibido
+  console.log('[YouTubeEmbed] Rendering with youtubeId:', youtubeId, 'title:', title);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(!liteMode);
   const [isPlaying, setIsPlaying] = useState(autoplay);

@@ -33,6 +33,10 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
   const { slides, options } = props;
   const [emblaRef, emblaApi] = useEmblaCarousel(options);
 
+  // DEBUG: Log slides para verificar datos YouTube
+  console.log('[EmblaCarousel2] Total slides:', slides.length);
+  console.log('[EmblaCarousel2] YouTube items:', slides.filter(s => s.type === 'youtube' || s.format === 'youtube').map(s => ({ type: s.type, format: s.format, youtubeId: s.youtubeId })));
+
   const {
     prevBtnDisabled,
     nextBtnDisabled,
@@ -48,6 +52,17 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
             // Determinar si es YouTube o video MP4
             const isYouTube =
               slide.type === "youtube" || slide.format === "youtube";
+
+            // DEBUG: Log cada slide con YouTube
+            if (slide.type === "youtube" || slide.format === "youtube") {
+              console.log('[EmblaCarousel2] Processing YouTube slide:', {
+                type: slide.type,
+                format: slide.format,
+                youtubeId: slide.youtubeId,
+                isYouTube,
+                hasYoutubeId: !!slide.youtubeId
+              });
+            }
 
             if (isYouTube && slide.youtubeId) {
               return (

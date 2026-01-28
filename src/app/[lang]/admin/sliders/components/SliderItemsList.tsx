@@ -3,11 +3,12 @@
 // 🎯 PORQUÉ EXISTE: Mostrar items del slider con reordenamiento drag&drop nativo
 // 🔄 FLUJO: Items → Drag&Drop → reorderSliderItems() → Update positions
 // 🚨 CUIDADO: Usa HTML5 Drag API nativa, NO librerías externas
+// 🚨 CUIDADO: handleToggleActive tiene rollback si falla la BD
 // 📋 SPEC: SPEC-26-01-2026-CMS-ContentManager
 
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import {
   GripVertical,
   Youtube,
@@ -17,6 +18,7 @@ import {
   Trash2,
   Pencil,
   ExternalLink,
+  Loader2,
 } from "lucide-react";
 import {
   reorderSliderItems,
@@ -55,6 +57,9 @@ export default function SliderItemsList({
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [isReordering, setIsReordering] = useState(false);
   const [editingItem, setEditingItem] = useState<SliderItem | null>(null);
+  // Estado para tracking de toggles en progreso y errores
+  const [togglingItemId, setTogglingItemId] = useState<number | null>(null);
+  const [toggleError, setToggleError] = useState<string | null>(null);
 
   // Drag handlers
   const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -106,13 +111,51 @@ export default function SliderItemsList({
 
   // Actions
   const handleToggleActive = async (item: SliderItem) => {
+    // Limpiar error previo
+    setToggleError(null);
+
+    // Guardar estado original para rollback
+    const originalActiveState = item.isActive;
+
+    // Marcar que estamos toggling este item
+    setTogglingItemId(item.id);
+
     // Optimistic update
     setItems(
       items.map((i) =>
         i.id === item.id ? { ...i, isActive: !i.isActive } : i,
       ),
     );
-    await toggleSliderItemActive(item.id);
+
+    try {
+      const result = await toggleSliderItemActive(item.id);
+
+      if (!result.success) {
+        // ROLLBACK: Revertir al estado original si falla
+        setItems(
+          items.map((i) =>
+            i.id === item.id ? { ...i, isActive: originalActiveState } : i,
+          ),
+        );
+        setToggleError(result.error || "Error al cambiar estado");
+
+        // Limpiar error despues de 3 segundos
+        setTimeout(() => setToggleError(null), 3000);
+      }
+    } catch (error) {
+      // ROLLBACK: Revertir si hay excepcion
+      setItems(
+        items.map((i) =>
+          i.id === item.id ? { ...i, isActive: originalActiveState } : i,
+        ),
+      );
+      setToggleError("Error de conexion al cambiar estado");
+
+      // Limpiar error despues de 3 segundos
+      setTimeout(() => setToggleError(null), 3000);
+    } finally {
+      setTogglingItemId(null);
+    }
   };
 
   const handleDelete = async (item: SliderItem) => {
@@ -169,6 +212,14 @@ export default function SliderItemsList({
         {isReordering && (
           <div className="bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm px-4 py-2 rounded-lg">
             Guardando orden...
+          </div>
+        )}
+
+        {/* Toggle error indicator */}
+        {toggleError && (
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-2 rounded-lg flex items-center gap-2">
+            <span>Error:</span>
+            <span>{toggleError}</span>
           </div>
         )}
 
@@ -258,14 +309,17 @@ export default function SliderItemsList({
               {/* Toggle active */}
               <button
                 onClick={() => handleToggleActive(item)}
+                disabled={togglingItemId === item.id}
                 className={`p-2 rounded-lg transition-colors ${
                   item.isActive
                     ? "text-green-400 hover:bg-green-500/10"
                     : "text-gray-500 hover:bg-gray-800"
-                }`}
+                } ${togglingItemId === item.id ? "opacity-50 cursor-not-allowed" : ""}`}
                 title={item.isActive ? "Desactivar" : "Activar"}
               >
-                {item.isActive ? (
+                {togglingItemId === item.id ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : item.isActive ? (
                   <Eye className="w-4 h-4" />
                 ) : (
                   <EyeOff className="w-4 h-4" />

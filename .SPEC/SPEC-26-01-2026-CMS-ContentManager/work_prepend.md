@@ -1,7 +1,7 @@
 # WORK LOG - SPEC-26-01-2026-CMS-ContentManager
 
 > **LIFO**: Entradas nuevas ARRIBA ⬆️
-> **Última actualización**: 27/01/2026
+> **Ultima actualizacion**: 28/01/2026
 
 ---
 
@@ -9,36 +9,291 @@
 
 | Item | Estado |
 |------|--------|
-| **Fase actual** | Fase 1-3 COMPLETADAS - BD producción lista |
-| **Tarea actual** | ✅ Migración BD + Seeds ejecutados |
-| **Bloqueadores** | Configurar SUPABASE_SERVICE_ROLE_KEY en Vercel |
-| **Próxima acción** | Rodolfo: Agregar variable en Vercel + Redeploy |
-| **Último commit** | 71545d6 - feat(db): diagnostic logging |
-| **BD Status** | 6 sliders, 48 items, 60 contenidos, 12 configs ✅ |
+| **Fase actual** | Fase 1-3 COMPLETADAS - BD produccion lista |
+| **Tarea actual** | DEBUG: Videos YouTube en carousel stories |
+| **Bloqueadores** | Pendiente verificacion de Rodolfo |
+| **Proxima accion** | Rodolfo: Reiniciar dev server + revisar consola |
+| **Ultimo commit** | (pendiente) |
+| **BD Status** | 6 sliders, 14 items en stories (12 MP4 + 2 YouTube), 60 contenidos, 12 configs |
 
 ---
 
 ## 📊 PROGRESO VISUAL
 
 ```
-FASE 1: MVP Sliders    [██████████] 100% (8/8 tareas) ✅
-FASE 2: Textos         [██████████] 100% (5/5 tareas) ✅
-FASE 3: Config         [██████████] 100% (4/4 tareas) ✅
+FASE 1: MVP Sliders    [██████████] 100% (8/8 tareas)
+FASE 2: Textos         [██████████] 100% (5/5 tareas)
+FASE 3: Config         [██████████] 100% (4/4 tareas)
 FASE 4: Polish         [░░░░░░░░░░] 0%
 ────────────────────────────────────
 TOTAL                  [████████░░] 85%
-+ BONUS: Hero Carousel integrado ✅
-+ BONUS: Golden Tickets carousel integrado ✅
-+ FIX: AutoScroll "DISFRUTA EN VIVO" ✅
-+ FIX: Hero slider agregado a BD ✅
-+ FIX: Video.tsx alturas inconsistentes ✅
-+ FIX: Upload imagenes en AddItemDialog ✅
-+ FIX: Upload imagenes en EditItemDialog ✅
++ BONUS: Hero Carousel integrado
++ BONUS: Golden Tickets carousel integrado
++ FIX: AutoScroll "DISFRUTA EN VIVO"
++ FIX: Hero slider agregado a BD
++ FIX: Video.tsx alturas inconsistentes
++ FIX: Upload imagenes en AddItemDialog
++ FIX: Upload imagenes en EditItemDialog
++ FIX: Toggle items slider con rollback
++ AUDIT: Carousels frontend isActive/cache (28/01/2026)
++ FIX: Cache invalidation con revalidateTag("sliders") (28/01/2026)
++ DEBUG: Videos YouTube en carousel stories (28/01/2026)
 ```
 
 ---
 
 ## 📝 LOG DE TRABAJO
+
+### 28/01/2026 - INVESTIGACION: VIDEOS YOUTUBE NO FUNCIONAN EN STORIES
+
+**Problema reportado por Rodolfo**: Videos de YouTube NO FUNCIONAN en la seccion de videos (carousel stories).
+
+**Investigacion realizada**:
+
+1. **Verificacion de BD**:
+   ```
+   Slider "Videos Historias" - section: "stories" - isActive: true
+   Items count: 14
+   - Items 1-12: type: "video_url" (MP4 de Supabase) - youtubeId: null
+   - Item 13: type: "youtube", youtubeId: 8RbEtHPXNho, isActive: true
+   - Item 14: type: "youtube", youtubeId: vWS7LqxSRzo, isActive: true
+   ```
+   **CONCLUSION**: SI hay videos YouTube en BD con datos correctos.
+
+2. **Revision de codigo**:
+   - `Carousel2.tsx`: Server component que carga de BD, mapea youtubeId correctamente
+   - `EmblaCarousel2.tsx`: Detecta `type === "youtube"` y renderiza YouTubeEmbed
+   - `YouTubeEmbed.tsx`: Usa lite mode (thumbnail primero, iframe al click)
+   - `youtube.ts`: Genera URLs de embed y thumbnails correctamente
+   **CONCLUSION**: El codigo es correcto.
+
+3. **Posibles causas**:
+   - **CACHE**: Los items estan en posicion 13-14 (al final del carousel)
+   - **IDs de YouTube**: Podrian ser videos privados/eliminados
+   - **Posicion scroll**: Usuario no llego a ver los items 13-14
+
+**Archivos con DEBUG logs agregados**:
+- `src/app/[lang]/components/sections/carousel2/Carousel2.tsx` - Log slider y items YouTube
+- `src/app/[lang]/components/sections/carousel2/EmblaCarousel2.tsx` - Log slides y deteccion YouTube
+- `src/app/[lang]/components/YouTubeEmbed.tsx` - Log youtubeId recibido
+
+**Proximos pasos para Rodolfo**:
+1. Reiniciar servidor de desarrollo (`npm run dev`)
+2. Abrir consola navegador (F12 > Console)
+3. Ir a seccion stories y hacer scroll en el carousel hasta el final
+4. Verificar logs en consola:
+   - `[Carousel2] Slider loaded: ...`
+   - `[Carousel2] YouTube items from BD: ...`
+   - `[EmblaCarousel2] Total slides: ...`
+   - `[EmblaCarousel2] YouTube items: ...`
+   - `[YouTubeEmbed] Rendering with youtubeId: ...`
+
+**Verificar thumbnails (URLs que deben funcionar)**:
+- https://img.youtube.com/vi/8RbEtHPXNho/hqdefault.jpg
+- https://img.youtube.com/vi/vWS7LqxSRzo/hqdefault.jpg
+
+**Status**: DEBUG en progreso, esperando feedback de Rodolfo
+**Spec ref**: SPEC-26-01-2026-CMS-ContentManager, REQ-02 (YouTube), Tarea 1.9
+
+---
+
+### 28/01/2026 - FIX CRITICO: IMAGENES DE SUPABASE NO SE VEIAN EN FRONTEND
+
+**Problema reportado por Rodolfo**: Subio imagenes a Supabase Storage desde el admin panel pero NO APARECIAN en el frontend (Hero Carousel y otros).
+
+**Investigacion realizada**:
+
+1. **Verificacion de BD**: La imagen de Supabase SI estaba guardada en BD:
+   ```
+   Hero Carousel: 6 items
+   - Items 1-5: URLs locales (/bannerImage4.avif, etc.) - OK
+   - Item 6: https://aslzzjjkccbfmmeeqbhy.supabase.co/storage/v1/object/public/events/sliders/1769556265286-o985arv.jpeg
+   ```
+
+2. **Verificacion de next.config.js**: Dominio de Supabase configurado correctamente.
+
+3. **ROOT CAUSE ENCONTRADO**: El cache de `unstable_cache` NO se estaba invalidando correctamente.
+   - Las queries de sliders usan `unstable_cache` con tag `["sliders"]` y revalidate 60s
+   - Las server actions usaban solo `revalidatePath("/")` que NO invalida `unstable_cache`
+   - Necesitaban usar `revalidateTag("sliders")` para invalidar el cache correctamente
+
+**Solucion aplicada**:
+
+1. **`src/actions/cms/slider.ts`** - Agregado `revalidateTag("sliders")` a TODAS las funciones que modifican datos:
+   - `createSlider()` - al crear slider
+   - `updateSlider()` - al actualizar slider
+   - `deleteSlider()` - al eliminar slider
+   - `createSliderItem()` - al agregar item (CRITICO para nuevas imagenes)
+   - `updateSliderItem()` - al editar item
+   - `deleteSliderItem()` - al eliminar item
+   - `reorderSliderItems()` - al reordenar
+   - `toggleSliderItemActive()` - al toggle activo/inactivo
+
+2. **`next.config.js`** - Agregado pathname especifico para Supabase Storage:
+   ```javascript
+   remotePatterns: [{
+     protocol: "https",
+     hostname: "aslzzjjkccbfmmeeqbhy.supabase.co",
+     pathname: "/storage/v1/object/public/**",  // AGREGADO
+   }]
+   ```
+
+**Archivos modificados**:
+- `src/actions/cms/slider.ts` - import revalidateTag + 8 llamadas a revalidateTag
+- `next.config.js` - pathname para remotePatterns
+
+**Por que funcionaba antes con imagenes locales**:
+- Las imagenes locales (/bannerImage.avif) estan en /public y se sirven directamente
+- El cache de unstable_cache retornaba esas URLs sin problema
+- Pero cuando se agregaba una imagen NUEVA, el cache seguia sirviendo la version vieja (sin el item nuevo)
+
+**PENDIENTE VERIFICAR**: Rodolfo debe probar:
+1. Refrescar la pagina (puede requerir hard refresh Ctrl+Shift+R)
+2. Esperar 60 segundos para que expire el cache viejo (o reiniciar dev server)
+3. La imagen de Supabase deberia aparecer en el Hero Carousel
+
+**🔗 Spec ref**: REQ-07 (Integracion Frontend), tasks.md → 1.9
+**📊 Status**: Fix aplicado, pendiente verificacion de Rodolfo
+
+---
+
+### 28/01/2026 - AUDITORIA COMPLETA CAROUSELS FRONTEND
+
+**Objetivo**: Analizar por qué los items de sliders podrían no mostrarse correctamente en frontend
+
+**Carousels analizados** (6 total):
+1. HeroCarousel (sections/hero/)
+2. Stories/Carousel2 (sections/carousel2/)
+3. ArtistsCarousel (carousel2/)
+4. LogoCarousel/Brands (carousel/)
+5. Live Carousel (sections/carousel/)
+6. GoldenTicketsCarousel (carousel-tickets/)
+
+---
+
+#### TABLA DE HALLAZGOS
+
+| Carousel | Section BD | Filtro isActive | Orden position | Cache | Fallback JSON |
+|----------|------------|-----------------|----------------|-------|---------------|
+| Hero | "hero" | Solo query | Solo query | 60s | imgsCarousel.json |
+| Stories | "stories" | Solo query | Solo query | 60s | histories.json |
+| Artists | "artists" | Query + componente | Query + componente | 60s | imgs-artists.json |
+| Brands | "brands" | Solo query | Solo query | 60s | useCarouselBrands.js |
+| Live | "live" | Query + componente | Query + componente | 60s | slides.json |
+| Tickets | "tickets" | Query + componente | Query + componente | 60s | useCarouselGoldenTickets.js |
+
+---
+
+#### CONCLUSIONES
+
+**1. NO HAY BUGS CRÍTICOS** - El sistema funciona correctamente:
+- La query `getSliderBySection()` ya filtra por `isActive: true` y ordena por `position: asc` a nivel de BD
+- Los componentes que re-filtran/re-ordenan (Artists, Live, Tickets) son redundantes pero NO rompen nada
+
+**2. INCONSISTENCIA MENOR** (no crítica):
+- Hero, Stories, Brands confían 100% en la query
+- Artists, Live, Tickets tienen filtrado defensivo adicional
+
+**3. CACHE FUNCIONA CORRECTAMENTE**:
+- `unstable_cache` con revalidate: 60 segundos
+- Tags: `["sliders"]` para invalidación selectiva
+- Cambios en admin tardan hasta 1 minuto en reflejarse (comportamiento esperado)
+
+**4. RUTAS DE IMÁGENES OK**:
+- Locales (/public/): `/bannerImage5.avif`
+- Supabase Storage: URLs completas funcionan
+- YouTube embeds: Construidos correctamente con `youtubeId`
+- Videos MP4: URLs de Supabase Storage
+
+---
+
+#### ARCHIVOS ANALIZADOS
+
+```
+src/app/[lang]/components/
+├── sections/hero/
+│   ├── HeroCarousel.tsx          - Server, sin filtro defensivo
+│   └── HeroCarouselClient.tsx    - Client, solo render
+├── sections/carousel2/
+│   ├── Carousel2.tsx             - Server, sin filtro defensivo
+│   └── EmblaCarousel2.tsx        - Client, soporte YouTube
+├── carousel2/
+│   ├── ArtistsCarousel.tsx       - Server, CON filtro defensivo
+│   └── ArtistsCarouselClient.tsx - Client, Embla
+├── carousel/
+│   ├── LogoCarousel.tsx          - Server, sin filtro defensivo
+│   └── LogoCarouselClient.tsx    - Client, CSS animation
+├── sections/carousel/
+│   ├── Carousel.tsx              - Server, CON filtro defensivo
+│   └── EmblaCarousel.tsx         - Client, AutoScroll
+└── carousel-tickets/
+    ├── GoldenTicketsCarousel.tsx      - Server, CON filtro defensivo
+    └── GoldenTicketsCarouselClient.tsx - Client, CSS scroll
+
+src/queries/cms/
+└── getSliders.ts                 - Query con cache 60s, filtra isActive en BD
+```
+
+---
+
+#### SI HAY PROBLEMAS DE ITEMS NO VISIBLES, VERIFICAR:
+
+1. **BD**: El slider tiene `isActive: true`?
+2. **BD**: El item tiene `isActive: true`?
+3. **Cache**: Esperar 60 segundos después de cambios
+4. **Fallback**: Si BD vacía, usa JSON hardcodeado
+5. **Logs**: Ver `npm run dev` para errores de query
+
+**Spec ref**: REQ-07 (Integración Frontend), tasks.md 1.9
+**Status**: Auditoría completada, standby para más órdenes
+
+---
+
+### 28/01/2026 - FIX TOGGLE SLIDER ITEMS CON ROLLBACK ✅
+
+**Problema reportado por Rodolfo**: El toggle de activar/desactivar items NO FUNCIONABA. En el admin panel algunos items tenian el ojo tachado (inactivos) pero cuando hacia toggle no respondia.
+
+**Diagnostico**:
+1. La funcion `handleToggleActive` en `SliderItemsList.tsx` hacia optimistic update PERO:
+   - NO capturaba el resultado de `toggleSliderItemActive()`
+   - NO manejaba errores (try/catch faltante)
+   - NO hacia rollback si fallaba la BD
+   - NO daba feedback visual al usuario
+
+2. El server action `toggleSliderItemActive` en `slider.ts` SI devuelve `{ success, error, data }` pero el cliente lo ignoraba.
+
+**Solucion aplicada en** `src/app/[lang]/admin/sliders/components/SliderItemsList.tsx`:
+
+1. **Nuevos estados**:
+   - `togglingItemId` - ID del item en proceso (para spinner)
+   - `toggleError` - Mensaje de error (para banner rojo)
+
+2. **handleToggleActive mejorado**:
+   - Guarda estado original antes del optimistic update
+   - Captura resultado con try/catch
+   - Si `result.success === false` o excepcion: ROLLBACK al estado original
+   - Muestra error en banner rojo por 3 segundos
+   - Limpia estado de loading al terminar (finally)
+
+3. **UI mejorada**:
+   - Spinner `Loader2` mientras toggle en progreso
+   - Boton deshabilitado durante toggle
+   - Banner de error rojo con mensaje descriptivo
+
+4. **Limpieza**:
+   - Removido import `useRef` no usado
+   - Agregado import `Loader2` de lucide-react
+   - Actualizada miga de pan con CUIDADO sobre rollback
+
+**Archivos modificados**:
+- `src/app/[lang]/admin/sliders/components/SliderItemsList.tsx`
+
+**⚠️ PENDIENTE VERIFICAR**: Rodolfo debe probar que el toggle funciona en el admin panel.
+
+**🔗 Spec ref**: REQ-01 (Sistema de Sliders)
+**📋 SPEC**: SPEC-26-01-2026-CMS-ContentManager
+
+---
 
 ### 27/01/2026 - MIGRACIÓN BD PRODUCCIÓN EJECUTADA ✅
 

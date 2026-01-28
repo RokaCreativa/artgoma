@@ -36,6 +36,13 @@ const Carousel2 = async () => {
   // Intentar cargar desde BD primero
   const slider = await getSliderBySection("stories");
 
+  // DEBUG: Log slider data
+  console.log('[Carousel2] Slider loaded:', slider ? { name: slider.name, itemsCount: slider.items.length } : 'null');
+  if (slider?.items) {
+    const youtubeItems = slider.items.filter(i => i.type === 'youtube');
+    console.log('[Carousel2] YouTube items from BD:', youtubeItems.map(i => ({ id: i.id, type: i.type, youtubeId: i.youtubeId, isActive: i.isActive })));
+  }
+
   let slides: CarouselVideoItem[];
 
   if (slider && slider.items && slider.items.length > 0) {
