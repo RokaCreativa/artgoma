@@ -10,9 +10,9 @@
 | Item | Estado |
 |------|--------|
 | **Fase actual** | Fase 1-3 COMPLETADAS - BD produccion lista |
-| **Tarea actual** | DEBUG: Videos YouTube en carousel stories |
+| **Tarea actual** | FIX: Sistema textos multiidioma |
 | **Bloqueadores** | Pendiente verificacion de Rodolfo |
-| **Proxima accion** | Rodolfo: Reiniciar dev server + revisar consola |
+| **Proxima accion** | Rodolfo: Reiniciar dev server + probar editar texto en admin |
 | **Ultimo commit** | (pendiente) |
 | **BD Status** | 6 sliders, 14 items en stories (12 MP4 + 2 YouTube), 60 contenidos, 12 configs |
 
@@ -38,11 +38,66 @@ TOTAL                  [████████░░] 85%
 + AUDIT: Carousels frontend isActive/cache (28/01/2026)
 + FIX: Cache invalidation con revalidateTag("sliders") (28/01/2026)
 + DEBUG: Videos YouTube en carousel stories (28/01/2026)
++ FIX CRITICO: Cache invalidation textos multiidioma (28/01/2026)
 ```
 
 ---
 
 ## 📝 LOG DE TRABAJO
+
+### 28/01/2026 - FIX CRITICO: TEXTOS MULTIIDIOMA NO SE ACTUALIZABAN
+
+**Problema reportado por Rodolfo**: Los textos multiidioma del CMS no funcionan. Los cambios hechos en el admin panel no se reflejan en el frontend.
+
+**ROOT CAUSES ENCONTRADOS**:
+
+1. **BUG: revalidateTag con argumentos incorrectos**
+   - `revalidateTag("cms-content", "max")` - Segundo argumento IGNORADO
+   - Next.js revalidateTag solo acepta UN argumento (el tag name)
+   - Esto no causaba error pero era codigo muerto
+
+2. **BUG CRITICO: Inconsistencia de tags de cache**
+   - `dictionary.ts` usa tags: `["cms-content", "dictionary"]`
+   - `getSectionContent.ts` usa tags: `["section-content"]`
+   - Las server actions SOLO invalidaban `"cms-content"` pero NO `"section-content"` ni `"dictionary"`
+   - Resultado: El cache de queries nunca se invalidaba correctamente
+
+**SOLUCION APLICADA**:
+
+1. **Corregido revalidateTag** - Removido segundo argumento en todos los archivos:
+   - `src/actions/cms/content.ts` - 4 funciones corregidas
+   - `src/actions/cms/config.ts` - 3 funciones corregidas
+
+2. **Invalidacion de TODOS los tags relacionados** - Ahora content.ts invalida:
+   ```typescript
+   revalidateTag("cms-content");      // Para dictionary.ts
+   revalidateTag("section-content");  // Para getSectionContent.ts
+   revalidateTag("dictionary");       // Para dictionary.ts
+   ```
+
+3. **Agregado DEBUG logging** en `dictionary.ts`:
+   - Logs en desarrollo para ver que secciones vienen de BD
+   - Logs cuando falla query o cae a JSON fallback
+
+**ARCHIVOS MODIFICADOS**:
+- `src/actions/cms/content.ts` - Fix revalidateTag + agregar tags faltantes
+- `src/actions/cms/config.ts` - Fix revalidateTag
+- `src/configs/dictionary.ts` - Agregar debug logging
+
+**PARA VERIFICAR**:
+1. Reiniciar servidor de desarrollo (`npm run dev`)
+2. Ir a `/es/admin/content`
+3. Editar un texto (ej: home.h1)
+4. Guardar
+5. Ir al frontend y verificar que el texto cambio
+6. Ver consola del servidor para logs:
+   - `[getDictionary] locale=es, DB sections=...`
+   - `[getDictionaryFromDB] locale=es, found X active sections`
+
+**Spec ref**: REQ-03 (Textos Multiidioma), Tarea 2.4
+**Status**: Fix aplicado, PENDIENTE VERIFICACION DE RODOLFO
+
+---
 
 ### 28/01/2026 - INVESTIGACION: VIDEOS YOUTUBE NO FUNCIONAN EN STORIES
 

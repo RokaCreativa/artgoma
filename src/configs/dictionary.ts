@@ -69,6 +69,12 @@ export const getDictionary = async (locale: Locale): Promise<Dictionary> => {
   // Primero intentamos obtener desde BD con cache
   const dbContent = await getDictionaryFromDB(locale);
 
+  // DEBUG: Ver que viene de BD
+  if (process.env.NODE_ENV === "development") {
+    const dbKeys = dbContent ? Object.keys(dbContent) : [];
+    console.log(`[getDictionary] locale=${locale}, DB sections=${dbKeys.length}:`, dbKeys.join(", ") || "(empty)");
+  }
+
   // Si tenemos contenido de BD, lo usamos
   if (dbContent && Object.keys(dbContent).length > 0) {
     // Obtenemos el JSON como fallback para secciones que no estén en BD
@@ -79,6 +85,9 @@ export const getDictionary = async (locale: Locale): Promise<Dictionary> => {
   }
 
   // Fallback completo a JSON si BD vacía o falla
+  if (process.env.NODE_ENV === "development") {
+    console.log(`[getDictionary] Using JSON fallback for locale=${locale}`);
+  }
   return getJsonDictionary(locale);
 };
 
@@ -105,6 +114,9 @@ const getDictionaryFromDB = unstable_cache(
     try {
       // Verificar si el modelo existe
       if (!prisma.sectionContent) {
+        if (process.env.NODE_ENV === "development") {
+          console.log("[getDictionaryFromDB] prisma.sectionContent not available");
+        }
         return null;
       }
 
@@ -123,6 +135,11 @@ const getDictionaryFromDB = unstable_cache(
         },
       });
 
+      // DEBUG: Log query result
+      if (process.env.NODE_ENV === "development") {
+        console.log(`[getDictionaryFromDB] locale=${locale}, found ${sections.length} active sections`);
+      }
+
       // Si no hay nada en BD, retornamos null para usar JSON
       if (!sections || sections.length === 0) {
         return null;
@@ -136,11 +153,10 @@ const getDictionaryFromDB = unstable_cache(
       }
 
       return result as Partial<Dictionary>;
-    } catch {
+    } catch (error) {
       // Si hay error de BD (ej: tabla no existe aún), silenciosamente usar fallback JSON
-      // Solo loggear en desarrollo si se necesita debug
-      if (process.env.NODE_ENV === "development" && process.env.DEBUG_CMS) {
-        console.warn("[getDictionary] BD query failed, using JSON fallback");
+      if (process.env.NODE_ENV === "development") {
+        console.warn("[getDictionaryFromDB] BD query failed:", error);
       }
       return null;
     }

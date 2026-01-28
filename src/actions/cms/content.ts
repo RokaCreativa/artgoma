@@ -347,8 +347,10 @@ export async function upsertSectionContent(
       },
     });
 
-    // Revalidar cache
-    revalidateTag("cms-content", "max");
+    // Revalidar cache - TODOS los tags relacionados con contenido
+    revalidateTag("cms-content");
+    revalidateTag("section-content");
+    revalidateTag("dictionary");
     revalidatePath("/admin/content");
     revalidatePath(`/${validatedLocale}`); // Revalidar página del idioma
 
@@ -399,8 +401,10 @@ export async function deleteSectionContent(id: number): Promise<{
       where: { id: validated.data.id },
     });
 
-    // Revalidar cache
-    revalidateTag("cms-content", "max");
+    // Revalidar cache - TODOS los tags relacionados con contenido
+    revalidateTag("cms-content");
+    revalidateTag("section-content");
+    revalidateTag("dictionary");
     revalidatePath("/admin/content");
     revalidatePath(`/${existing.locale}`);
 
@@ -458,8 +462,10 @@ export async function toggleSectionContentActive(id: number): Promise<{
       },
     });
 
-    // Revalidar cache
-    revalidateTag("cms-content", "max");
+    // Revalidar cache - TODOS los tags relacionados con contenido
+    revalidateTag("cms-content");
+    revalidateTag("section-content");
+    revalidateTag("dictionary");
     revalidatePath("/admin/content");
     revalidatePath(`/${existing.locale}`);
 
@@ -572,8 +578,10 @@ export async function copySectionContentToLocale(
       },
     });
 
-    // Revalidar cache
-    revalidateTag("cms-content", "max");
+    // Revalidar cache - TODOS los tags relacionados con contenido
+    revalidateTag("cms-content");
+    revalidateTag("section-content");
+    revalidateTag("dictionary");
     revalidatePath("/admin/content");
     revalidatePath(`/${validatedToLocale.data}`);
 
