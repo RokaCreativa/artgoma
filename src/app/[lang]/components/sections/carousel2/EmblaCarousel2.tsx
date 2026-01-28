@@ -13,8 +13,10 @@
 
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
 import { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 import {
   NextButton,
   PrevButton,
@@ -31,7 +33,11 @@ type PropType = {
 
 const EmblaCarousel: React.FC<PropType> = (props) => {
   const { slides, options } = props;
-  const [emblaRef, emblaApi] = useEmblaCarousel(options);
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(options, [
+    Autoplay({ playOnInit: true, delay: 5000, stopOnInteraction: false })
+  ]);
 
   // DEBUG: Log slides para verificar datos YouTube
   console.log('[EmblaCarousel2] Total slides:', slides.length);
@@ -74,9 +80,9 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
                     youtubeId={slide.youtubeId}
                     title={slide.title || slide.alt}
                     aspectRatio="vertical"
-                    autoplay={false}
+                    autoplay={true}
                     showControls={true}
-                    liteMode={true}
+                    liteMode={false}
                     className="h-full w-full shadow-gray-800 shadow-lg"
                     thumbnailQuality="hqdefault"
                   />
