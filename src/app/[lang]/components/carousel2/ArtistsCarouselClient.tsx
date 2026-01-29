@@ -37,7 +37,7 @@ const ArtistsCarouselClient: React.FC<ArtistsCarouselClientProps> = ({
   const [emblaRef] = useEmblaCarousel(OPTIONS);
 
   return (
-    <div className="embla max-w-full mx-auto bg-artgoma-primary py-16">
+    <div className="embla max-w-full mx-auto bg-[var(--artgoma-bg-primary)] py-16">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {artists.map((img) => (

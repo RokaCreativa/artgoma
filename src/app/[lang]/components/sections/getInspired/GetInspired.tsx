@@ -11,7 +11,7 @@ const GetInspired = async ({ lang }: { lang: Locale }) => {
   const { inspire } = await getDictionary(lang);
 
   return (
-    <div id="get-inspired" className="relative flex flex-col justify-center overflow-x-hidden bg-artgoma-primary">
+    <div id="get-inspired" className="relative flex flex-col justify-center overflow-x-hidden bg-[var(--artgoma-bg-primary)]">
       <Circle
         color="border-red-600"
         position="absolute"

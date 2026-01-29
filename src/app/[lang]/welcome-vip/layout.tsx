@@ -10,7 +10,7 @@ export default function RootLayout({
   }>;
 }>) {
   return (
-    <div className="relative overflow-hidden bg-artgoma-primary h-screen w-screen">
+    <div className="relative overflow-hidden bg-[var(--artgoma-bg-primary)] h-screen w-screen">
       <Circle
         color="border-red-600"
         position="absolute"

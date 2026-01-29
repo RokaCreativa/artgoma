@@ -27,7 +27,7 @@ const GoldenTicketsCarouselClient = ({ tickets }: Props) => {
   const duplicatedTickets = [...tickets, ...tickets];
 
   return (
-    <section className="bg-artgoma-primary w-full inline-flex flex-nowrap overflow-x-hidden pb-8 lg:h-80">
+    <section className="bg-[var(--artgoma-bg-primary)] w-full inline-flex flex-nowrap overflow-x-hidden pb-8 lg:h-80">
       <ul className="flex items-center space-x-4 lg:space-x-16 animate-loop-scroll-right px-0 lg:px-8 [&_li]:mx-4 [&_img]:max-w-none">
         {duplicatedTickets.map((item, i) => (
           <li key={`ticket-${i}`}>

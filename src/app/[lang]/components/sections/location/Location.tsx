@@ -11,7 +11,7 @@ const Location = async ({ lang }: { lang: Locale }) => {
   const { contact } = await getDictionary(lang);
 
   return (
-    <div id="contact" className="bg-artgoma-primary pt-16 md:pt-32">
+    <div id="contact" className="bg-[var(--artgoma-bg-primary)] pt-16 md:pt-32">
       <div className="flex flex-col md:flex-row justify-between px-10 md:px-16 lg:px-32 text-center">
         <H2Location text={contact.h1} />
         <Image
