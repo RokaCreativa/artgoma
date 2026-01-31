@@ -146,6 +146,20 @@ const CONFIGS = [
     group: "appearance",
     label: "Tipografia Cuerpo",
   },
+  {
+    key: "connect_image",
+    value: "/banana.avif",
+    type: "url",
+    group: "appearance",
+    label: "Imagen Seccion Conecte",
+  },
+  {
+    key: "connect_pattern",
+    value: "/paterngoma.png",
+    type: "url",
+    group: "appearance",
+    label: "Pattern Fondo Conecte",
+  },
 ];
 
 /**

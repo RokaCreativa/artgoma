@@ -88,6 +88,18 @@ const CONFIG_GROUPS_DEFINITION: Array<{
         type: "select",
         options: [...FONT_OPTIONS.body],
       },
+      {
+        key: "connect_image",
+        label: "Imagen Sección Conecte (banana)",
+        type: "url",
+        placeholder: "/banana.avif",
+      },
+      {
+        key: "connect_pattern",
+        label: "Pattern Fondo Conecte",
+        type: "url",
+        placeholder: "/paterngoma.png",
+      },
     ],
   },
   {

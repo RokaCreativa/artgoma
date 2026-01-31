@@ -13,6 +13,8 @@ const APPEARANCE_CONFIGS = [
   { key: "bg_footer", value: "#000000", type: "color", group: "appearance", label: "Color Footer" },
   { key: "font_display", value: "Cormorant Garamond", type: "select", group: "appearance", label: "Fuente Títulos" },
   { key: "font_body", value: "Montserrat", type: "select", group: "appearance", label: "Fuente Textos" },
+  { key: "connect_image", value: "/banana.avif", type: "url", group: "appearance", label: "Imagen Sección Conecte" },
+  { key: "connect_pattern", value: "/paterngoma.png", type: "url", group: "appearance", label: "Pattern Fondo Conecte" },
 ];
 
 export async function GET() {
