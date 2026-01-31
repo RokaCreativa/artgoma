@@ -498,7 +498,12 @@ export async function autoTranslateSectionContent(
   };
   error?: string;
 }> {
+  console.log('[autoTranslateSectionContent] 🚀 INICIO');
+  console.log('[autoTranslateSectionContent] 📋 Section:', sectionKey);
+  console.log('[autoTranslateSectionContent] 🌍 From:', sourceLocale, '→ To:', targetLocale);
+
   const isAuth = await isAdminAuthenticated();
+  console.log('[autoTranslateSectionContent] 🔐 Auth:', isAuth ? '✅' : '❌');
   if (!isAuth) {
     return { success: false, error: "No autorizado" };
   }
@@ -524,8 +529,13 @@ export async function autoTranslateSectionContent(
     }
 
     // Verificar que OPENAI_API_KEY existe
+    console.log('[autoTranslateSectionContent] 🔑 Verificando OPENAI_API_KEY...');
     const openaiKey = process.env.OPENAI_API_KEY;
+    console.log('[autoTranslateSectionContent] Key exists:', !!openaiKey);
+    console.log('[autoTranslateSectionContent] Key length:', openaiKey?.length || 0);
+
     if (!openaiKey) {
+      console.log('[autoTranslateSectionContent] ❌ OPENAI_API_KEY NO configurada');
       return {
         success: false,
         error: "OPENAI_API_KEY no configurada. Añade la variable de entorno para usar auto-traducción."
@@ -533,6 +543,7 @@ export async function autoTranslateSectionContent(
     }
 
     // Obtener contenido origen
+    console.log('[autoTranslateSectionContent] 📥 Buscando contenido source en BD...');
     const source = await prisma.sectionContent.findUnique({
       where: {
         sectionKey_locale: {
@@ -542,11 +553,17 @@ export async function autoTranslateSectionContent(
       },
     });
 
+    console.log('[autoTranslateSectionContent] Source encontrado:', source ? '✅' : '❌');
+
     if (!source) {
+      console.log('[autoTranslateSectionContent] ❌ Source NO existe - abortando');
       return { success: false, error: `No existe contenido en ${sourceLocale} para esta sección` };
     }
 
+    console.log('[autoTranslateSectionContent] 📦 Source content keys:', Object.keys(source.content as object));
+
     // Obtener contenido destino existente (para preservar campos ya traducidos)
+    console.log('[autoTranslateSectionContent] 📥 Buscando contenido target en BD...');
     const target = await prisma.sectionContent.findUnique({
       where: {
         sectionKey_locale: {

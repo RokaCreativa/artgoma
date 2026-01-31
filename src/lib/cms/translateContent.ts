@@ -157,12 +157,24 @@ export async function translateSectionContent(
   existingContent?: Record<string, unknown> | null,
   options: TranslationOptions = {}
 ): Promise<TranslationResult> {
+  console.log('[translateSectionContent] 🚀 INICIO');
+  console.log('[translateSectionContent] 📥 From:', fromLang, '→ To:', toLang);
+  console.log('[translateSectionContent] 📦 Source content keys:', Object.keys(content));
+  console.log('[translateSectionContent] 🔍 Existing content:', existingContent ? 'SÍ' : 'NO');
+  console.log('[translateSectionContent] ⚙️ Options:', options);
+
   const { preserveExisting = true } = options;
   const errors: string[] = [];
   let totalTokensUsed = 0;
 
   // Validar que tenemos API key
+  console.log('[translateSectionContent] 🔑 Verificando OPENAI_API_KEY...');
+  console.log('[translateSectionContent] Key exists:', !!process.env.OPENAI_API_KEY);
+  console.log('[translateSectionContent] Key length:', process.env.OPENAI_API_KEY?.length || 0);
+
   if (!process.env.OPENAI_API_KEY) {
+    console.log('[translateSectionContent] ❌ OPENAI_API_KEY NO configurada');
+
     return {
       success: false,
       translatedContent: {},
