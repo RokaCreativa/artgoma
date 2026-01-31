@@ -477,6 +477,308 @@ export async function toggleSectionContentActive(id: number): Promise<{
 }
 
 /**
+ * Auto-traduce contenido de una sección usando IA (GPT-4o-mini)
+ * Solo traduce campos vacíos, preserva contenido existente
+ * @param sectionKey - Key de la sección
+ * @param sourceLocale - Idioma origen (normalmente 'es')
+ * @param targetLocale - Idioma destino
+ * @returns Resultado con campos traducidos y costo estimado
+ */
+export async function autoTranslateSectionContent(
+  sectionKey: string,
+  sourceLocale: string,
+  targetLocale: string,
+): Promise<{
+  success: boolean;
+  data?: {
+    fieldsTranslated: number;
+    totalFields: number;
+    cost: string;
+    content: Prisma.JsonValue;
+  };
+  error?: string;
+}> {
+  const isAuth = await isAdminAuthenticated();
+  if (!isAuth) {
+    return { success: false, error: "No autorizado" };
+  }
+
+  try {
+    // Validar inputs
+    const validatedSection = SectionKeySchema.safeParse(sectionKey);
+    const validatedSourceLocale = LocaleSchema.safeParse(sourceLocale);
+    const validatedTargetLocale = LocaleSchema.safeParse(targetLocale);
+
+    if (!validatedSection.success) {
+      return { success: false, error: validatedSection.error.errors[0].message };
+    }
+    if (!validatedSourceLocale.success) {
+      return { success: false, error: `Idioma origen: ${validatedSourceLocale.error.errors[0].message}` };
+    }
+    if (!validatedTargetLocale.success) {
+      return { success: false, error: `Idioma destino: ${validatedTargetLocale.error.errors[0].message}` };
+    }
+
+    if (validatedSourceLocale.data === validatedTargetLocale.data) {
+      return { success: false, error: "Los idiomas origen y destino deben ser diferentes" };
+    }
+
+    // Verificar que OPENAI_API_KEY existe
+    const openaiKey = process.env.OPENAI_API_KEY;
+    if (!openaiKey) {
+      return {
+        success: false,
+        error: "OPENAI_API_KEY no configurada. Añade la variable de entorno para usar auto-traducción."
+      };
+    }
+
+    // Obtener contenido origen
+    const source = await prisma.sectionContent.findUnique({
+      where: {
+        sectionKey_locale: {
+          sectionKey: validatedSection.data,
+          locale: validatedSourceLocale.data,
+        },
+      },
+    });
+
+    if (!source) {
+      return { success: false, error: `No existe contenido en ${sourceLocale} para esta sección` };
+    }
+
+    // Obtener contenido destino existente (para preservar campos ya traducidos)
+    const target = await prisma.sectionContent.findUnique({
+      where: {
+        sectionKey_locale: {
+          sectionKey: validatedSection.data,
+          locale: validatedTargetLocale.data,
+        },
+      },
+    });
+
+    const sourceContent = source.content as Record<string, unknown>;
+    const targetContent = (target?.content as Record<string, unknown>) || {};
+
+    // Identificar campos que necesitan traducción (vacíos o inexistentes en target)
+    const fieldsToTranslate: Record<string, unknown> = {};
+    const fieldsAlreadyTranslated: Record<string, unknown> = {};
+
+    function collectFieldsToTranslate(
+      srcObj: Record<string, unknown>,
+      tgtObj: Record<string, unknown>,
+      toTranslate: Record<string, unknown>,
+      alreadyDone: Record<string, unknown>,
+      path: string = ""
+    ) {
+      for (const key of Object.keys(srcObj)) {
+        const srcValue = srcObj[key];
+        const tgtValue = tgtObj[key];
+        const currentPath = path ? `${path}.${key}` : key;
+
+        if (typeof srcValue === "object" && srcValue !== null && !Array.isArray(srcValue)) {
+          // Recursión para objetos anidados
+          const nestedToTranslate: Record<string, unknown> = {};
+          const nestedAlreadyDone: Record<string, unknown> = {};
+          collectFieldsToTranslate(
+            srcValue as Record<string, unknown>,
+            (tgtValue as Record<string, unknown>) || {},
+            nestedToTranslate,
+            nestedAlreadyDone,
+            currentPath
+          );
+          if (Object.keys(nestedToTranslate).length > 0) {
+            toTranslate[key] = nestedToTranslate;
+          }
+          if (Object.keys(nestedAlreadyDone).length > 0) {
+            alreadyDone[key] = nestedAlreadyDone;
+          }
+        } else if (Array.isArray(srcValue)) {
+          // Arrays: traducir si target está vacío o no existe
+          if (!tgtValue || (Array.isArray(tgtValue) && tgtValue.length === 0)) {
+            toTranslate[key] = srcValue;
+          } else {
+            alreadyDone[key] = tgtValue;
+          }
+        } else {
+          // Valores primitivos: traducir si target está vacío
+          const tgtStr = typeof tgtValue === "string" ? tgtValue.trim() : "";
+          if (!tgtStr) {
+            toTranslate[key] = srcValue;
+          } else {
+            alreadyDone[key] = tgtValue;
+          }
+        }
+      }
+    }
+
+    collectFieldsToTranslate(sourceContent, targetContent, fieldsToTranslate, fieldsAlreadyTranslated);
+
+    // Contar campos a traducir
+    function countFields(obj: Record<string, unknown>): number {
+      let count = 0;
+      for (const value of Object.values(obj)) {
+        if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+          count += countFields(value as Record<string, unknown>);
+        } else {
+          count += 1;
+        }
+      }
+      return count;
+    }
+
+    const fieldsToTranslateCount = countFields(fieldsToTranslate);
+    const totalFields = countFields(sourceContent);
+
+    if (fieldsToTranslateCount === 0) {
+      return {
+        success: true,
+        data: {
+          fieldsTranslated: 0,
+          totalFields,
+          cost: "$0.00",
+          content: targetContent,
+        },
+      };
+    }
+
+    // Mapeo de códigos de idioma a nombres legibles
+    const LANGUAGE_NAMES: Record<string, string> = {
+      es: "Spanish",
+      en: "English",
+      de: "German",
+      fr: "French",
+      it: "Italian",
+      ru: "Russian",
+    };
+
+    const sourceLangName = LANGUAGE_NAMES[validatedSourceLocale.data] || validatedSourceLocale.data;
+    const targetLangName = LANGUAGE_NAMES[validatedTargetLocale.data] || validatedTargetLocale.data;
+
+    // Llamar a OpenAI para traducir
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${openaiKey}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `You are a professional translator. Translate the following JSON content from ${sourceLangName} to ${targetLangName}.
+IMPORTANT RULES:
+1. Preserve the exact JSON structure and keys
+2. Only translate the string VALUES, never the keys
+3. Keep arrays as arrays with translated items
+4. Maintain any special characters, HTML entities, or formatting
+5. Return ONLY valid JSON, no explanations or markdown
+6. For proper nouns (names, brands), keep them unchanged unless they have an official translation`,
+          },
+          {
+            role: "user",
+            content: JSON.stringify(fieldsToTranslate, null, 2),
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 4096,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error("[autoTranslateSectionContent] OpenAI error:", errorData);
+      return { success: false, error: "Error al conectar con servicio de traducción" };
+    }
+
+    const data = await response.json();
+    const translatedText = data.choices?.[0]?.message?.content;
+
+    if (!translatedText) {
+      return { success: false, error: "No se recibió respuesta del servicio de traducción" };
+    }
+
+    // Parsear respuesta JSON
+    let translatedFields: Record<string, unknown>;
+    try {
+      // Limpiar posibles backticks de markdown
+      const cleanJson = translatedText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+      translatedFields = JSON.parse(cleanJson);
+    } catch {
+      console.error("[autoTranslateSectionContent] JSON parse error:", translatedText);
+      return { success: false, error: "Error al procesar respuesta de traducción" };
+    }
+
+    // Merge: contenido existente + traducido
+    function deepMerge(
+      existing: Record<string, unknown>,
+      translated: Record<string, unknown>
+    ): Record<string, unknown> {
+      const result = { ...existing };
+      for (const key of Object.keys(translated)) {
+        const translatedValue = translated[key];
+        if (typeof translatedValue === "object" && translatedValue !== null && !Array.isArray(translatedValue)) {
+          result[key] = deepMerge(
+            (result[key] as Record<string, unknown>) || {},
+            translatedValue as Record<string, unknown>
+          );
+        } else {
+          result[key] = translatedValue;
+        }
+      }
+      return result;
+    }
+
+    const mergedContent = deepMerge(targetContent, translatedFields);
+
+    // Guardar en BD
+    await prisma.sectionContent.upsert({
+      where: {
+        sectionKey_locale: {
+          sectionKey: validatedSection.data,
+          locale: validatedTargetLocale.data,
+        },
+      },
+      update: {
+        content: mergedContent as Prisma.InputJsonValue,
+        updatedAt: new Date(),
+      },
+      create: {
+        sectionKey: validatedSection.data,
+        locale: validatedTargetLocale.data,
+        content: mergedContent as Prisma.InputJsonValue,
+        isActive: true,
+      },
+    });
+
+    // Revalidar cache
+    revalidateTag("cms-content", "max");
+    revalidateTag("section-content", "max");
+    revalidateTag("dictionary", "max");
+    revalidatePath("/admin/content");
+    revalidatePath(`/${validatedTargetLocale.data}`);
+
+    // Estimar costo (GPT-4o-mini: $0.15 input, $0.60 output per 1M tokens)
+    const inputTokens = data.usage?.prompt_tokens || 0;
+    const outputTokens = data.usage?.completion_tokens || 0;
+    const cost = ((inputTokens * 0.15 + outputTokens * 0.6) / 1_000_000).toFixed(4);
+
+    return {
+      success: true,
+      data: {
+        fieldsTranslated: fieldsToTranslateCount,
+        totalFields,
+        cost: `$${cost}`,
+        content: mergedContent,
+      },
+    };
+  } catch (error) {
+    console.error("[autoTranslateSectionContent] Error:", error);
+    return { success: false, error: "Error al auto-traducir contenido" };
+  }
+}
+
+/**
  * Copia contenido de un idioma a otro
  * Útil para crear traducciones partiendo de un idioma base
  * @param sectionKey - Key de la sección

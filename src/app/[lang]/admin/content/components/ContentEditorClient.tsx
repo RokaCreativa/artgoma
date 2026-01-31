@@ -10,6 +10,8 @@
 import { useState, useCallback } from "react";
 import { FileText, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
+import { autoTranslateSectionContent } from "@/actions/cms/content";
 import LocaleTabs from "./LocaleTabs";
 import SectionEditor from "./SectionEditor";
 
@@ -45,6 +47,11 @@ export default function ContentEditorClient({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [localExistingMap, setLocalExistingMap] = useState(existingContentMap);
 
+  // Auto-translate state
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [translatingLocale, setTranslatingLocale] = useState<string | null>(null);
+  const [editorKey, setEditorKey] = useState(0); // Force re-mount of SectionEditor
+
   const currentSection = sections.find((s) => s.key === selectedSection);
   const existingLocalesForSection = localExistingMap[selectedSection] || [];
 
@@ -61,6 +68,71 @@ export default function ContentEditorClient({
       }
       return prev;
     });
+  }, [selectedSection, selectedLocale]);
+
+  // Auto-translate handler
+  const handleAutoTranslate = useCallback(async (targetLocale: string) => {
+    // Confirm before translating
+    const confirmed = window.confirm(
+      `¿Auto-traducir la sección "${selectedSection}" desde Español a ${targetLocale.toUpperCase()}?\n\n` +
+      `Solo se traducirán los campos vacíos. Los campos existentes se preservarán.`
+    );
+
+    if (!confirmed) return;
+
+    setIsTranslating(true);
+    setTranslatingLocale(targetLocale);
+
+    try {
+      const result = await autoTranslateSectionContent(
+        selectedSection,
+        "es", // Source: Spanish
+        targetLocale
+      );
+
+      if (result.success && result.data) {
+        const { fieldsTranslated, totalFields, cost } = result.data;
+
+        // Update existing map to reflect new content
+        setLocalExistingMap((prev) => {
+          const current = prev[selectedSection] || [];
+          if (!current.includes(targetLocale)) {
+            return {
+              ...prev,
+              [selectedSection]: [...current, targetLocale],
+            };
+          }
+          return prev;
+        });
+
+        // Show success toast
+        toast({
+          title: "Traduccion completada",
+          description: `${fieldsTranslated} de ${totalFields} campos traducidos. Costo: ${cost}`,
+        });
+
+        // If user is viewing the translated locale, force reload the editor
+        if (selectedLocale === targetLocale) {
+          setEditorKey((prev) => prev + 1);
+        }
+      } else {
+        toast({
+          title: "Error al traducir",
+          description: result.error || "Error desconocido",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Auto-translate error:", error);
+      toast({
+        title: "Error de conexion",
+        description: "No se pudo conectar con el servicio de traduccion",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTranslating(false);
+      setTranslatingLocale(null);
+    }
   }, [selectedSection, selectedLocale]);
 
   return (
@@ -185,21 +257,31 @@ export default function ContentEditorClient({
 
       {/* Locale Tabs */}
       <div className="bg-[#2a2d35] rounded-xl p-4">
-        <label className="block text-sm font-medium text-gray-400 mb-3">
-          Idioma
-        </label>
+        <div className="flex items-center justify-between mb-3">
+          <label className="block text-sm font-medium text-gray-400">
+            Idioma
+          </label>
+          {existingLocalesForSection.includes("es") && (
+            <span className="text-xs text-purple-400">
+              Pulsa el icono de estrella para auto-traducir desde ES
+            </span>
+          )}
+        </div>
         <LocaleTabs
           locales={locales}
           activeLocale={selectedLocale}
           existingLocales={existingLocalesForSection}
           onLocaleChange={setSelectedLocale}
+          onAutoTranslate={handleAutoTranslate}
+          isTranslating={isTranslating}
+          translatingLocale={translatingLocale}
         />
       </div>
 
       {/* Section Editor */}
       {currentSection && (
         <SectionEditor
-          key={`${selectedSection}-${selectedLocale}`}
+          key={`${selectedSection}-${selectedLocale}-${editorKey}`}
           sectionKey={selectedSection}
           sectionLabel={currentSection.label}
           sectionDescription={currentSection.description}
