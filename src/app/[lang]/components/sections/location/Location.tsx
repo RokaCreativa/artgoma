@@ -6,9 +6,15 @@ import Circle from "../../circle";
 import { Locale } from "@/configs/i18n.config";
 import { getDictionary } from "@/configs/dictionary";
 import Link from "next/link";
+import { getConfigByKey } from "@/actions/cms/config";
 
 const Location = async ({ lang }: { lang: Locale }) => {
-  const { contact } = await getDictionary(lang);
+  const [dictionary, exploreConfig] = await Promise.all([
+    getDictionary(lang),
+    getConfigByKey("explore_image"),
+  ]);
+  const { contact } = dictionary;
+  const exploreSrc = exploreConfig?.data?.value || "/explore.svg";
 
   return (
     <div id="contact" className="bg-[var(--artgoma-bg-primary)] pt-16 md:pt-32">
@@ -18,7 +24,7 @@ const Location = async ({ lang }: { lang: Locale }) => {
           className="hidden md:block h-[200px] w-[240px] lg:h-[300px] lg:w-[440px]"
           width={400}
           height={240}
-          src={"/explore.svg"}
+          src={exploreSrc}
           alt="explore word image font cursive"
         />
       </div>
@@ -43,7 +49,7 @@ const Location = async ({ lang }: { lang: Locale }) => {
             className="md:hidden translate-x-8"
             width={150}
             height={70}
-            src={"/explore.svg"}
+            src={exploreSrc}
             alt="explore word image font cursive"
           />
         </div>

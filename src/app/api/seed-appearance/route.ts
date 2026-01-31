@@ -19,6 +19,12 @@ const APPEARANCE_CONFIGS = [
   { key: "favicon_url", value: "/favicon.ico", type: "url", group: "appearance", label: "Favicon" },
   { key: "site_title", value: "ArtGoMA", type: "text", group: "appearance", label: "Título del Sitio" },
   { key: "site_description", value: "Welcome to GoMa gallery! UNIQUE ART EXPERIENCE IN TENERIFE", type: "text", group: "appearance", label: "Descripción del Sitio" },
+  { key: "og_image", value: "/bg-black-logo-goma.png", type: "url", group: "appearance", label: "Imagen OpenGraph" },
+  { key: "apple_touch_icon", value: "/apple-touch-icon.png", type: "url", group: "appearance", label: "Apple Touch Icon" },
+  { key: "explore_image", value: "/explore.svg", type: "url", group: "appearance", label: "Imagen Explore" },
+  { key: "rotate_axis_icon", value: "/rotate-axis.svg", type: "url", group: "appearance", label: "Icono 360" },
+  { key: "logo_horizontal", value: "/Logo Goma horizontal.svg", type: "url", group: "appearance", label: "Logo Horizontal" },
+  { key: "logo_vertical", value: "/LogoGomaVertical.svg", type: "url", group: "appearance", label: "Logo Vertical" },
 ];
 
 export async function GET() {

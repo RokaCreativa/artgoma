@@ -28,6 +28,7 @@ const SECTIONS = [
   "navbar",
   "dropdown",
   "form",
+  "ui",
 ] as const;
 
 interface DictionaryData {

@@ -25,7 +25,7 @@ const FormConfirmWithoutAuth = ({
   const [inputList, setInputList] = useState<Person[]>([]);
   const ref = useRef<HTMLFormElement>(null);
   const inputRef: any = useRef<HTMLInputElement>(null);
-  const { form } = useDictionary();
+  const { form, ui } = useDictionary();
 
   const [selectedDate, setSelectedDate] = useState<any>();
   const [selectedTime, setSelectedTime] = useState<string>("");
@@ -34,17 +34,17 @@ const FormConfirmWithoutAuth = ({
     if (state.status === "success") {
       toast({
         variant: "default",
-        title: "Successful",
-        description: "Confirmation successfully added!",
+        title: ui?.toasts?.successTitle ?? "Successful",
+        description: ui?.toasts?.successConfirmation ?? "Confirmation successfully added!",
       });
     } else if (state.status === "error") {
       toast({
         variant: "destructive",
-        title: "Erros",
-        description: `There was an error! ${state.message}`,
+        title: ui?.toasts?.errorTitle ?? "Error",
+        description: `${ui?.toasts?.errorMessage ?? "There was an error!"} ${state.message}`,
       });
     }
-  }, [state]);
+  }, [state, ui]);
 
   return (
     <div className="relative z-50 flex flex-col">

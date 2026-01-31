@@ -90,5 +90,37 @@
       "confirm": "Confirm",
       "more": "More about us"
     }
+  },
+  "ui": {
+    "toasts": {
+      "successTitle": "Successful",
+      "successConfirmation": "Confirmation submitted successfully!",
+      "errorTitle": "Error",
+      "errorMessage": "An error has occurred"
+    },
+    "dialog": {
+      "confirmTitle": "How would you like to confirm?",
+      "withAuth": "With Authentication",
+      "withoutAuth": "Without Authentication",
+      "withoutAuthTitle": "Confirm without authentication?",
+      "or": "or"
+    },
+    "auth": {
+      "login": "Login",
+      "logout": "Logout",
+      "visits": "Visits",
+      "events": "Events",
+      "eventsPanel": "Events Panel",
+      "qrGenerator": "QR Generator"
+    },
+    "accessibility": {
+      "sendEmail": "Send email",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "youtube": "YouTube",
+      "twitter": "Twitter",
+      "play": "Play",
+      "pause": "Pause"
+    }
   }
 }

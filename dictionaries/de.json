@@ -90,5 +90,37 @@
       "confirm": "Bestätigen",
       "more": "Erfahren Sie mehr über uns"
     }
+  },
+  "ui": {
+    "toasts": {
+      "successTitle": "Erfolgreich",
+      "successConfirmation": "Bestätigung erfolgreich gesendet!",
+      "errorTitle": "Fehler",
+      "errorMessage": "Ein Fehler ist aufgetreten"
+    },
+    "dialog": {
+      "confirmTitle": "Wie möchten Sie bestätigen?",
+      "withAuth": "Mit Authentifizierung",
+      "withoutAuth": "Ohne Authentifizierung",
+      "withoutAuthTitle": "Ohne Authentifizierung bestätigen?",
+      "or": "oder"
+    },
+    "auth": {
+      "login": "Anmelden",
+      "logout": "Abmelden",
+      "visits": "Besuche",
+      "events": "Veranstaltungen",
+      "eventsPanel": "Veranstaltungspanel",
+      "qrGenerator": "QR-Generator"
+    },
+    "accessibility": {
+      "sendEmail": "E-Mail senden",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "youtube": "YouTube",
+      "twitter": "Twitter",
+      "play": "Abspielen",
+      "pause": "Pause"
+    }
   }
 }

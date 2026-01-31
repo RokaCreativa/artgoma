@@ -6,9 +6,15 @@ import Circle from "../../circle";
 import Image from "next/image";
 import { Locale } from "@/configs/i18n.config";
 import { getDictionary } from "@/configs/dictionary";
+import { getConfigByKey } from "@/actions/cms/config";
 
 const GetInspired = async ({ lang }: { lang: Locale }) => {
-  const { inspire } = await getDictionary(lang);
+  const [dictionary, logoVerticalConfig] = await Promise.all([
+    getDictionary(lang),
+    getConfigByKey("logo_vertical"),
+  ]);
+  const { inspire } = dictionary;
+  const logoVerticalSrc = logoVerticalConfig?.data?.value || "/LogoGomaVertical.svg";
 
   return (
     <div id="get-inspired" className="relative flex flex-col justify-center overflow-x-hidden bg-[var(--artgoma-bg-primary)]">
@@ -30,7 +36,7 @@ const GetInspired = async ({ lang }: { lang: Locale }) => {
       <div className="flex items-end h-full">
         <Image
           className="absolute -right-9 bottom-8 opacity-25 lg:opacity-100"
-          src={"/LogoGomaVertical.svg"}
+          src={logoVerticalSrc}
           alt="vertical logo"
           height={700}
           width={180}

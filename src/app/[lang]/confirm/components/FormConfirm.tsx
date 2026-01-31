@@ -21,7 +21,7 @@ const FormConfirm = ({ collaborator }: { collaborator?: string }) => {
   const [inputList, setInputList] = useState<Person[]>([]);
   const ref = useRef<HTMLFormElement>(null);
   const inputRef: any = useRef<HTMLInputElement>(null);
-  const { form } = useDictionary();
+  const { form, ui } = useDictionary();
 
   const [selectedDate, setSelectedDate] = useState<any>();
   const [selectedTime, setSelectedTime] = useState<string>("");
@@ -30,17 +30,17 @@ const FormConfirm = ({ collaborator }: { collaborator?: string }) => {
     if (state.status === "success") {
       toast({
         variant: "default",
-        title: "Successful",
-        description: "Confirmation submited succesfuly!",
+        title: ui?.toasts?.successTitle ?? "Successful",
+        description: ui?.toasts?.successConfirmation ?? "Confirmation submitted successfully!",
       });
     } else if (state.status === "error") {
       toast({
         variant: "destructive",
-        title: "Erros",
-        description: `Unexpected error. ${state.message}`,
+        title: ui?.toasts?.errorTitle ?? "Error",
+        description: `${ui?.toasts?.errorMessage ?? "Unexpected error."} ${state.message}`,
       });
     }
-  }, [state]);
+  }, [state, ui]);
 
   return (
     <div className="relative z-50 flex flex-col p-4 md:p-6 rounded-xl bg-white backdrop-blur-3xl shadow-xl shadow-gray-800">

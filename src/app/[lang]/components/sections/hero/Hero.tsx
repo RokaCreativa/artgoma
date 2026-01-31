@@ -8,10 +8,16 @@ import DialogConfirm from "../../dialog-confirm";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import Link from "next/link";
+import { getConfigByKey } from "@/actions/cms/config";
 
 const Hero = async ({ lang }: { lang: Locale }) => {
-  const { home } = await getDictionary(lang);
-  const session = await getServerSession(authOptions);
+  const [dictionary, session, rotateAxisConfig] = await Promise.all([
+    getDictionary(lang),
+    getServerSession(authOptions),
+    getConfigByKey("rotate_axis_icon"),
+  ]);
+  const { home } = dictionary;
+  const rotateAxisSrc = rotateAxisConfig?.data?.value || "/rotate-axis.svg";
 
   return (
     <div id="home" className="relative h-screen">
@@ -27,7 +33,7 @@ const Hero = async ({ lang }: { lang: Locale }) => {
 
           <Image
             className="inline-flex h-full w-full items-center justify-center rounded-2xl bg-gray-950 p-2 text-sm font-medium text-gray-50 backdrop-blur-3xl"
-            src={"/rotate-axis.svg"}
+            src={rotateAxisSrc}
             height={100}
             width={100}
             alt="rotate-axis"

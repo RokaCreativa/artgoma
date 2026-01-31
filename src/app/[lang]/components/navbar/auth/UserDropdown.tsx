@@ -24,11 +24,13 @@ import { Session } from "next-auth";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useDictionary } from "@/providers/DictionaryProvider";
 
 const UserDropdown = ({ session }: { session: Session }) => {
   const params = useParams();
   const lang = params.lang;
   const initials = session?.user?.name?.slice(0, 3).toUpperCase();
+  const { ui } = useDictionary();
 
   if (session) {
     return (
@@ -55,28 +57,28 @@ const UserDropdown = ({ session }: { session: Session }) => {
               hidden={session?.user?.badge !== "admin" ? true : false}
               className="text-white hover:font-semibold flex justify-between"
             >
-              <Link href={`/${lang}/visits`}>Visits</Link>
+              <Link href={`/${lang}/visits`}>{ui?.auth?.visits ?? "Visits"}</Link>
               <Ticket />
             </DropdownMenuItem>
             <DropdownMenuItem
               hidden={session?.user?.badge !== "admin" ? true : false}
               className="text-white hover:font-semibold flex justify-between"
             >
-              <Link href={`/${lang}/events`}>Events</Link>
+              <Link href={`/${lang}/events`}>{ui?.auth?.events ?? "Events"}</Link>
               <PartyPopper />
             </DropdownMenuItem>
             <DropdownMenuItem
               hidden={session?.user?.badge !== "admin" ? true : false}
               className="text-white hover:font-semibold flex justify-between"
             >
-              <Link href={`/${lang}/events-panel`}>Events Panel</Link>
+              <Link href={`/${lang}/events-panel`}>{ui?.auth?.eventsPanel ?? "Events Panel"}</Link>
               <Settings2 />
             </DropdownMenuItem>
             <DropdownMenuItem
               hidden={session?.user?.badge !== "admin" ? true : false}
               className="text-white hover:font-semibold flex justify-between"
             >
-              <Link href={`/${lang}/generate-qr`}>Qr-Generator</Link>
+              <Link href={`/${lang}/generate-qr`}>{ui?.auth?.qrGenerator ?? "QR Generator"}</Link>
               <QrCodeIcon />
             </DropdownMenuItem>
             <DropdownMenuItem className="text-white hover:font-semibold">
@@ -85,7 +87,7 @@ const UserDropdown = ({ session }: { session: Session }) => {
                 type="button"
                 onClick={() => signOut()}
               >
-                Logout
+                {ui?.auth?.logout ?? "Logout"}
                 <LogOut className="h-4 w-4" />
               </button>
             </DropdownMenuItem>
@@ -99,7 +101,7 @@ const UserDropdown = ({ session }: { session: Session }) => {
         href={`/${lang}/login`}
         className="flex justify-between items-center gap-2 bg-black/70 hover:bg-white/20 border-2 border-red-700 text-white rounded-full p-2"
       >
-        <span className="text-md">Login</span> <LogIn className="h-4 w-4" />
+        <span className="text-md">{ui?.auth?.login ?? "Login"}</span> <LogIn className="h-4 w-4" />
       </Link>
     );
   }

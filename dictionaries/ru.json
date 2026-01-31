@@ -90,5 +90,37 @@
       "confirm": "Подтвердить",
       "more": "Узнать больше о нас"
     }
+  },
+  "ui": {
+    "toasts": {
+      "successTitle": "Успешно",
+      "successConfirmation": "Подтверждение успешно отправлено!",
+      "errorTitle": "Ошибка",
+      "errorMessage": "Произошла ошибка"
+    },
+    "dialog": {
+      "confirmTitle": "Как вы хотите подтвердить?",
+      "withAuth": "С аутентификацией",
+      "withoutAuth": "Без аутентификации",
+      "withoutAuthTitle": "Подтвердить без аутентификации?",
+      "or": "или"
+    },
+    "auth": {
+      "login": "Войти",
+      "logout": "Выйти",
+      "visits": "Посещения",
+      "events": "События",
+      "eventsPanel": "Панель событий",
+      "qrGenerator": "Генератор QR"
+    },
+    "accessibility": {
+      "sendEmail": "Отправить email",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "youtube": "YouTube",
+      "twitter": "Twitter",
+      "play": "Воспроизвести",
+      "pause": "Пауза"
+    }
   }
 }

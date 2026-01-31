@@ -38,10 +38,12 @@ const GetInTouch = async ({ lang }: { lang: Locale }) => {
   const { getInTouch } = await getDictionary(lang);
 
   // Obtener datos de contacto de BD con cache (300s)
-  const [contactData, mapsLinkData] = await Promise.all([
+  const [contactData, mapsLinkData, logoHorizontalConfig] = await Promise.all([
     getContactInfo(),
     getConfigByKey("maps_link"),
+    getConfigByKey("logo_horizontal"),
   ]);
+  const logoHorizontalSrc = logoHorizontalConfig || "/Logo Goma horizontal.svg";
 
   // Merge con fallbacks (BD tiene prioridad)
   const contact = {
@@ -61,7 +63,7 @@ const GetInTouch = async ({ lang }: { lang: Locale }) => {
           className="hidden md:block"
           width={400}
           height={100}
-          src={"/Logo Goma horizontal.svg"}
+          src={logoHorizontalSrc}
           alt="Logo Goma horizontal"
         />
         <div className="flex flex-col w-11/12 md:w-3/5 lg:w-1/3">

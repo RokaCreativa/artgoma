@@ -23,6 +23,19 @@ import {
   getContactInfo,
   getConfigMapByGroup,
 } from "@/queries/cms/getSiteConfig";
+import type { UIContent } from "@/lib/cms/sectionSchemas";
+
+// ============================================
+// FALLBACKS ARIA-LABELS (accesibilidad)
+// ============================================
+
+const FALLBACK_ACCESSIBILITY = {
+  sendEmail: "Enviar email",
+  facebook: "Facebook",
+  instagram: "Instagram",
+  youtube: "YouTube",
+  twitter: "Twitter",
+};
 
 // ============================================
 // FALLBACKS (valores actuales hardcodeados)
@@ -54,13 +67,26 @@ const FALLBACK_FOOTER = {
 // COMPONENTE (Server Component con async)
 // ============================================
 
-const Footer = async () => {
+interface FooterProps {
+  ui?: UIContent;
+}
+
+const Footer = async ({ ui }: FooterProps = {}) => {
   // Obtener datos de BD con cache (300s)
   const [social, contact, footerConfig] = await Promise.all([
     getSocialLinks(),
     getContactInfo(),
     getConfigMapByGroup("footer"),
   ]);
+
+  // Aria labels con fallbacks
+  const ariaLabels = {
+    sendEmail: ui?.accessibility?.sendEmail ?? FALLBACK_ACCESSIBILITY.sendEmail,
+    facebook: ui?.accessibility?.facebook ?? FALLBACK_ACCESSIBILITY.facebook,
+    instagram: ui?.accessibility?.instagram ?? FALLBACK_ACCESSIBILITY.instagram,
+    youtube: ui?.accessibility?.youtube ?? FALLBACK_ACCESSIBILITY.youtube,
+    twitter: ui?.accessibility?.twitter ?? FALLBACK_ACCESSIBILITY.twitter,
+  };
 
   // Merge con fallbacks (BD tiene prioridad)
   const socialLinks = {
@@ -88,7 +114,7 @@ const Footer = async () => {
             target="_blank"
             rel="noopener noreferrer"
             href={`mailto:${contactInfo.email}`}
-            aria-label="Enviar email"
+            aria-label={ariaLabels.sendEmail}
           >
             <Mail className="text-white h-6 w-6 hover:text-red-600 transition-colors" />
           </a>
@@ -100,7 +126,7 @@ const Footer = async () => {
             target="_blank"
             rel="noopener noreferrer"
             href={socialLinks.facebook}
-            aria-label="Facebook"
+            aria-label={ariaLabels.facebook}
           >
             <Facebook className="text-white h-6 w-6 hover:text-red-600 transition-colors" />
           </a>
@@ -112,7 +138,7 @@ const Footer = async () => {
             target="_blank"
             rel="noopener noreferrer"
             href={socialLinks.instagram}
-            aria-label="Instagram"
+            aria-label={ariaLabels.instagram}
           >
             <InstagramIcon className="text-white h-6 w-6 hover:text-red-600 transition-colors" />
           </a>
@@ -124,7 +150,7 @@ const Footer = async () => {
             target="_blank"
             rel="noopener noreferrer"
             href={socialLinks.youtube}
-            aria-label="YouTube"
+            aria-label={ariaLabels.youtube}
           >
             <YoutubeIcon className="text-white h-6 w-6 hover:text-red-600 transition-colors" />
           </a>
@@ -136,7 +162,7 @@ const Footer = async () => {
             target="_blank"
             rel="noopener noreferrer"
             href={socialLinks.twitter}
-            aria-label="Twitter"
+            aria-label={ariaLabels.twitter}
           >
             <Twitter className="text-white h-6 w-6 hover:text-red-600 transition-colors" />
           </a>

@@ -127,6 +127,9 @@ export default function ConfigGroup({
   configs,
   groupKey,
 }: ConfigGroupProps) {
+  // DEBUG: Verificar configs que llegan (remover después de testing)
+  console.log(`[ConfigGroup ${groupKey}] configs recibidas:`, configs.map(c => ({ key: c.key, value: c.value, type: c.type })));
+
   // Resolver icono desde el mapa
   const Icon = iconMap[iconName] || Phone;
   const [isExpanded, setIsExpanded] = useState(true);
@@ -140,6 +143,8 @@ export default function ConfigGroup({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (key: string, value: string, type: string) => {
+    // DEBUG: Verificar que onChange se dispara (remover después de testing)
+    console.log(`[ConfigGroup] handleChange: key=${key}, value=${value}, type=${type}`);
     setValues((prev) => ({ ...prev, [key]: value }));
 
     // Limpiar estado de guardado previo

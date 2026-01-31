@@ -44,6 +44,7 @@ const SECTION_KEYS = [
   "navbar",
   "dropdown",
   "form",
+  "ui",
 ] as const;
 
 // ============================================

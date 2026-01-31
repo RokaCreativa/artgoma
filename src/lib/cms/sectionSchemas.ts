@@ -192,6 +192,45 @@ export const FormSchema = z.object({
 export type FormContent = z.infer<typeof FormSchema>;
 
 // ============================================
+// SCHEMA: UI (Textos de interfaz general)
+// ============================================
+
+export const UISchema = z.object({
+  toasts: z.object({
+    successTitle: z.string().min(1, "Titulo exito requerido"),
+    successConfirmation: z.string().min(1, "Mensaje confirmacion requerido"),
+    errorTitle: z.string().min(1, "Titulo error requerido"),
+    errorMessage: z.string().min(1, "Mensaje error requerido"),
+  }),
+  dialog: z.object({
+    confirmTitle: z.string().min(1, "Titulo confirmar requerido"),
+    withAuth: z.string().min(1, "Texto con auth requerido"),
+    withoutAuth: z.string().min(1, "Texto sin auth requerido"),
+    withoutAuthTitle: z.string().min(1, "Titulo sin auth requerido"),
+    or: z.string().min(1, "Texto 'o' requerido"),
+  }),
+  auth: z.object({
+    login: z.string().min(1, "Texto login requerido"),
+    logout: z.string().min(1, "Texto logout requerido"),
+    visits: z.string().min(1, "Texto visitas requerido"),
+    events: z.string().min(1, "Texto eventos requerido"),
+    eventsPanel: z.string().min(1, "Texto panel eventos requerido"),
+    qrGenerator: z.string().min(1, "Texto generador QR requerido"),
+  }),
+  accessibility: z.object({
+    sendEmail: z.string().min(1, "Aria-label email requerido"),
+    facebook: z.string().min(1, "Aria-label Facebook requerido"),
+    instagram: z.string().min(1, "Aria-label Instagram requerido"),
+    youtube: z.string().min(1, "Aria-label YouTube requerido"),
+    twitter: z.string().min(1, "Aria-label Twitter requerido"),
+    play: z.string().min(1, "Aria-label play requerido"),
+    pause: z.string().min(1, "Aria-label pause requerido"),
+  }),
+});
+
+export type UIContent = z.infer<typeof UISchema>;
+
+// ============================================
 // SECCIONES DISPONIBLES
 // ============================================
 
@@ -206,6 +245,7 @@ export const AVAILABLE_SECTIONS = [
   "navbar",
   "dropdown",
   "form",
+  "ui",
 ] as const;
 
 export type SectionKey = (typeof AVAILABLE_SECTIONS)[number];
@@ -583,6 +623,146 @@ export const SECTION_SCHEMAS = {
       },
     ],
   },
+  ui: {
+    key: "ui" as const,
+    label: "Interfaz de Usuario",
+    description: "Textos generales de la interfaz: toasts, dialogos, auth, accesibilidad",
+    schema: UISchema,
+    fields: [
+      {
+        name: "toasts.successTitle",
+        type: "text" as const,
+        label: "Toast: Titulo Exito",
+        placeholder: "Exitoso",
+      },
+      {
+        name: "toasts.successConfirmation",
+        type: "text" as const,
+        label: "Toast: Mensaje Confirmacion",
+        placeholder: "Confirmacion enviada correctamente!",
+      },
+      {
+        name: "toasts.errorTitle",
+        type: "text" as const,
+        label: "Toast: Titulo Error",
+        placeholder: "Error",
+      },
+      {
+        name: "toasts.errorMessage",
+        type: "text" as const,
+        label: "Toast: Mensaje Error",
+        placeholder: "Ha ocurrido un error",
+      },
+      {
+        name: "dialog.confirmTitle",
+        type: "text" as const,
+        label: "Dialog: Titulo Confirmar",
+        placeholder: "Como desea confirmar?",
+      },
+      {
+        name: "dialog.withAuth",
+        type: "text" as const,
+        label: "Dialog: Con Autenticacion",
+        placeholder: "Con Autenticacion",
+      },
+      {
+        name: "dialog.withoutAuth",
+        type: "text" as const,
+        label: "Dialog: Sin Autenticacion",
+        placeholder: "Sin Autenticacion",
+      },
+      {
+        name: "dialog.withoutAuthTitle",
+        type: "text" as const,
+        label: "Dialog: Titulo Sin Auth",
+        placeholder: "Confirmar sin autenticacion?",
+      },
+      {
+        name: "dialog.or",
+        type: "text" as const,
+        label: "Dialog: Texto 'o'",
+        placeholder: "o",
+      },
+      {
+        name: "auth.login",
+        type: "text" as const,
+        label: "Auth: Login",
+        placeholder: "Iniciar Sesion",
+      },
+      {
+        name: "auth.logout",
+        type: "text" as const,
+        label: "Auth: Logout",
+        placeholder: "Cerrar Sesion",
+      },
+      {
+        name: "auth.visits",
+        type: "text" as const,
+        label: "Auth: Visitas",
+        placeholder: "Visitas",
+      },
+      {
+        name: "auth.events",
+        type: "text" as const,
+        label: "Auth: Eventos",
+        placeholder: "Eventos",
+      },
+      {
+        name: "auth.eventsPanel",
+        type: "text" as const,
+        label: "Auth: Panel Eventos",
+        placeholder: "Panel de Eventos",
+      },
+      {
+        name: "auth.qrGenerator",
+        type: "text" as const,
+        label: "Auth: Generador QR",
+        placeholder: "Generador QR",
+      },
+      {
+        name: "accessibility.sendEmail",
+        type: "text" as const,
+        label: "Accesibilidad: Enviar Email",
+        placeholder: "Enviar email",
+      },
+      {
+        name: "accessibility.facebook",
+        type: "text" as const,
+        label: "Accesibilidad: Facebook",
+        placeholder: "Facebook",
+      },
+      {
+        name: "accessibility.instagram",
+        type: "text" as const,
+        label: "Accesibilidad: Instagram",
+        placeholder: "Instagram",
+      },
+      {
+        name: "accessibility.youtube",
+        type: "text" as const,
+        label: "Accesibilidad: YouTube",
+        placeholder: "YouTube",
+      },
+      {
+        name: "accessibility.twitter",
+        type: "text" as const,
+        label: "Accesibilidad: Twitter",
+        placeholder: "Twitter",
+      },
+      {
+        name: "accessibility.play",
+        type: "text" as const,
+        label: "Accesibilidad: Reproducir",
+        placeholder: "Reproducir",
+      },
+      {
+        name: "accessibility.pause",
+        type: "text" as const,
+        label: "Accesibilidad: Pausar",
+        placeholder: "Pausar",
+      },
+    ],
+  },
 } as const;
 
 // ============================================
@@ -603,7 +783,8 @@ export type SectionContentData =
   | WelcomePageContent
   | NavbarContent
   | DropdownContent
-  | FormContent;
+  | FormContent
+  | UIContent;
 
 // Mapeo de sección a su tipo de contenido
 export type SectionContentMap = {
@@ -617,6 +798,7 @@ export type SectionContentMap = {
   navbar: NavbarContent;
   dropdown: DropdownContent;
   form: FormContent;
+  ui: UIContent;
 };
 
 // ============================================

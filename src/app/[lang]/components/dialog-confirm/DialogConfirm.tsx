@@ -8,20 +8,24 @@ import { getDictionary } from "@/configs/dictionary";
 import { Locale } from "@/configs/i18n.config";
 
 const DialogConfirm = async ({ lang }: { lang: Locale }) => {
-  const { home } = await getDictionary(lang);
+  const dictionary = await getDictionary(lang);
+  const { home, ui } = dictionary;
+
   return (
     <Dialog>
       <DialogTriggerWrapper text={home.button} />
       <DialogContent className="shadow-red-600/50 shadow-xl">
         <DialogHeader>
-          <DialogTitle className="mb-4 text-center">How would you like to confirm?</DialogTitle>
+          <DialogTitle className="mb-4 text-center">
+            {ui?.dialog?.confirmTitle ?? "How would you like to confirm?"}
+          </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col md:flex-row items-center justify-center gap-2">
           <Link className={cn(buttonVariants({ variant: "default" }))} href={`/${lang}/confirm`}>
-            With Authentication
+            {ui?.dialog?.withAuth ?? "With Authentication"}
           </Link>
-          <span className="font-semibold">or</span>
-          <DialogFormConfirm lang={lang} />
+          <span className="font-semibold">{ui?.dialog?.or ?? "or"}</span>
+          <DialogFormConfirm lang={lang} ui={ui} />
         </div>
       </DialogContent>
     </Dialog>

@@ -16,6 +16,7 @@
 import { useRef, useEffect, useState } from "react";
 import { Pause, Play } from "lucide-react";
 import { getYouTubeEmbedUrl, getYouTubeThumbnail } from "@/lib/cms/youtube";
+import { useDictionary } from "@/providers/DictionaryProvider";
 
 interface YouTubeEmbedProps {
   youtubeId: string;
@@ -47,10 +48,15 @@ const YouTubeEmbed: React.FC<YouTubeEmbedProps> = ({
   // DEBUG: Verificar youtubeId recibido
   console.log('[YouTubeEmbed] Rendering with youtubeId:', youtubeId, 'title:', title);
 
+  const { ui } = useDictionary();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(!liteMode);
   const [isPlaying, setIsPlaying] = useState(autoplay);
   const [isVisible, setIsVisible] = useState(false);
+
+  // Accessibility labels from dictionary with fallbacks
+  const playLabel = ui?.accessibility?.play ?? "Play";
+  const pauseLabel = ui?.accessibility?.pause ?? "Pause";
 
   // Aspect ratio classes
   const aspectClasses = {
@@ -118,7 +124,7 @@ const YouTubeEmbed: React.FC<YouTubeEmbedProps> = ({
         <button
           onClick={handlePlayClick}
           className="absolute inset-0 w-full h-full group cursor-pointer"
-          aria-label={`Play ${title}`}
+          aria-label={`${playLabel} ${title}`}
         >
           {/* Thumbnail */}
           <img
@@ -151,7 +157,7 @@ const YouTubeEmbed: React.FC<YouTubeEmbedProps> = ({
         <button
           onClick={isPlaying ? handlePauseClick : handlePlayClick}
           className="absolute bottom-4 right-4 bg-black/50 hover:bg-black/70 p-2 rounded-full z-10 transition-colors"
-          aria-label={isPlaying ? "Pause" : "Play"}
+          aria-label={isPlaying ? pauseLabel : playLabel}
         >
           {isPlaying ? (
             <Pause className="w-5 h-5 text-white" />

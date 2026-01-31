@@ -90,5 +90,37 @@
       "confirm": "Confirmer",
       "more": "En savoir plus sur nous"
     }
+  },
+  "ui": {
+    "toasts": {
+      "successTitle": "Succès",
+      "successConfirmation": "Confirmation envoyée avec succès!",
+      "errorTitle": "Erreur",
+      "errorMessage": "Une erreur s'est produite"
+    },
+    "dialog": {
+      "confirmTitle": "Comment souhaitez-vous confirmer?",
+      "withAuth": "Avec Authentification",
+      "withoutAuth": "Sans Authentification",
+      "withoutAuthTitle": "Confirmer sans authentification?",
+      "or": "ou"
+    },
+    "auth": {
+      "login": "Connexion",
+      "logout": "Déconnexion",
+      "visits": "Visites",
+      "events": "Événements",
+      "eventsPanel": "Panneau des Événements",
+      "qrGenerator": "Générateur QR"
+    },
+    "accessibility": {
+      "sendEmail": "Envoyer un email",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "youtube": "YouTube",
+      "twitter": "Twitter",
+      "play": "Lecture",
+      "pause": "Pause"
+    }
   }
 }

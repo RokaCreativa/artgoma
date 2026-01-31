@@ -38,15 +38,23 @@ const montserrat = Montserrat({
 
 export async function generateMetadata(): Promise<Metadata> {
   // Cargar configs de meta desde BD
-  const [siteTitle, siteDesc, faviconUrl] = await Promise.all([
+  const [siteTitle, siteDesc, faviconUrl, ogImage, appleIcon] = await Promise.all([
     getConfigByKey("site_title"),
     getConfigByKey("site_description"),
     getConfigByKey("favicon_url"),
+    getConfigByKey("og_image"),
+    getConfigByKey("apple_touch_icon"),
   ]);
 
   const title = siteTitle?.data?.value || "ArtGoMA";
   const description = siteDesc?.data?.value || "Welcome to GoMa gallery! UNIQUE ART EXPERIENCE IN TENERIFE";
   const favicon = faviconUrl?.data?.value || "/favicon.ico";
+  const ogImageUrl = ogImage?.data?.value || "/bg-black-logo-goma.png";
+  const appleIconUrl = appleIcon?.data?.value || "/apple-touch-icon.png";
+
+  // Construir URL completa para OpenGraph (requiere URL absoluta)
+  const baseUrl = "https://artgoma.vercel.app";
+  const ogImageFull = ogImageUrl.startsWith("http") ? ogImageUrl : `${baseUrl}${ogImageUrl}`;
 
   return {
     title,
@@ -57,11 +65,11 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: "https://artgoma.vercel.app",
+      url: baseUrl,
       siteName: title,
       images: [
         {
-          url: "https://artgoma.vercel.app/bg-black-logo-goma.png",
+          url: ogImageFull,
           width: 600,
           height: 600,
           alt: title,
@@ -72,8 +80,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     icons: {
       icon: [favicon],
-      apple: ["/apple-touch-icon.png"],
-      shortcut: ["/apple-touch-icon.png"],
+      apple: [appleIconUrl],
+      shortcut: [appleIconUrl],
     },
   };
 }

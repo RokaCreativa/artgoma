@@ -124,6 +124,42 @@ const CONFIG_GROUPS_DEFINITION: Array<{
         type: "text",
         placeholder: "Welcome to GoMa gallery!",
       },
+      {
+        key: "og_image",
+        label: "Imagen OpenGraph (compartir)",
+        type: "url",
+        placeholder: "/bg-black-logo-goma.png",
+      },
+      {
+        key: "apple_touch_icon",
+        label: "Apple Touch Icon",
+        type: "url",
+        placeholder: "/apple-touch-icon.png",
+      },
+      {
+        key: "explore_image",
+        label: "Imagen 'Explore' (sección contacto)",
+        type: "url",
+        placeholder: "/explore.svg",
+      },
+      {
+        key: "rotate_axis_icon",
+        label: "Icono 360° (hero)",
+        type: "url",
+        placeholder: "/rotate-axis.svg",
+      },
+      {
+        key: "logo_horizontal",
+        label: "Logo Horizontal (GetInTouch)",
+        type: "url",
+        placeholder: "/Logo Goma horizontal.svg",
+      },
+      {
+        key: "logo_vertical",
+        label: "Logo Vertical (GetInspired)",
+        type: "url",
+        placeholder: "/LogoGomaVertical.svg",
+      },
     ],
   },
   {
