@@ -8,6 +8,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { FileText, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -40,6 +41,8 @@ export default function ContentEditorClient({
   locales,
   existingContentMap,
 }: ContentEditorClientProps) {
+  const router = useRouter();
+
   const [selectedSection, setSelectedSection] = useState<string>(
     sections[0]?.key || "",
   );
@@ -115,10 +118,9 @@ export default function ContentEditorClient({
           description: `${fieldsTranslated} de ${totalFields} campos traducidos. Costo: ${cost}`,
         });
 
-        // If user is viewing the translated locale, force reload the editor
-        if (selectedLocale === targetLocale) {
-          setEditorKey((prev) => prev + 1);
-        }
+        // Force reload editor and refresh data
+        setEditorKey((prev) => prev + 1);
+        router.refresh();
       } else {
         toast({
           title: "Error al traducir",
@@ -137,18 +139,23 @@ export default function ContentEditorClient({
       setIsTranslating(false);
       setTranslatingLocale(null);
     }
-  }, [selectedSection, selectedLocale]);
+  }, [selectedSection, selectedLocale, router]);
 
   // Translate All handler - translates to EN, DE, FR, IT, RU from ES
   const handleTranslateAll = useCallback(async () => {
     const targetLocales = ["en", "de", "fr", "it", "ru"];
 
-    // Confirm before translating
+    // Styled confirm - better than default browser confirm
     const confirmed = window.confirm(
-      `¿Traducir la seccion "${selectedSection}" a 5 idiomas?\n\n` +
-      `Idiomas: EN, DE, FR, IT, RU\n` +
-      `Costo estimado: ~$0.010\n\n` +
-      `Solo se traduciran los campos vacios. Los campos existentes se preservaran.`
+      `═══════════════════════════════\n` +
+      `  TRADUCCIÓN AUTOMÁTICA IA\n` +
+      `═══════════════════════════════\n\n` +
+      `Sección: ${selectedSection}\n` +
+      `Idiomas: EN, DE, FR, IT, RU (5 idiomas)\n\n` +
+      `• Solo traduce campos vacíos\n` +
+      `• Preserva traducciones existentes\n` +
+      `• Costo estimado: ~$0.010\n\n` +
+      `¿Proceder con la traducción?`
     );
 
     if (!confirmed) return;
@@ -223,14 +230,13 @@ export default function ContentEditorClient({
       });
     }
 
-    // Force reload editor if on a translated locale
-    if (targetLocales.includes(selectedLocale)) {
-      setEditorKey((prev) => prev + 1);
-    }
+    // Force reload editor - siempre (puede estar en cualquier idioma)
+    setEditorKey((prev) => prev + 1);
+    router.refresh(); // Actualiza datos del servidor
 
     setIsTranslatingAll(false);
     setTranslateAllProgress(null);
-  }, [selectedSection, selectedLocale]);
+  }, [selectedSection, selectedLocale, router]);
 
   return (
     <div className="space-y-6">
