@@ -636,7 +636,7 @@ export async function autoTranslateSectionContent(
           fieldsTranslated: 0,
           totalFields,
           cost: "$0.00",
-          content: targetContent,
+          content: targetContent as unknown as Prisma.JsonValue,
         },
       };
     }
@@ -769,7 +769,7 @@ IMPORTANT RULES:
         fieldsTranslated: fieldsToTranslateCount,
         totalFields,
         cost: `$${cost}`,
-        content: mergedContent,
+        content: mergedContent as unknown as Prisma.JsonValue,
       },
     };
   } catch (error) {
