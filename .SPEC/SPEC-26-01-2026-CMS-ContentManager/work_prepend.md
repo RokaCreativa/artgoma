@@ -14,7 +14,8 @@
 | **Bloqueadores** | Ninguno |
 | **Proxima accion** | Build + Commit + Push (cuando Rodolfo apruebe) |
 | **Ultimo commit** | (pendiente - sin commits por instrucción de Rodolfo) |
-| **BD Status** | 6 sliders, 48 items, 60 contenidos, 19 configs (12 orig + 7 appearance) |
+| **BD Status** | 6 sliders, 48 items, 60 contenidos, 25 configs (13 appearance) |
+| **Appearance** | 5 colores + 2 fonts + 4 imágenes + 2 meta = 13 configs |
 | **spec.md** | ✅ REQ-10 completado - Fase 5 100% |
 
 ---
