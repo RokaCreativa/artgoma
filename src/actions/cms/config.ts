@@ -20,7 +20,7 @@ import type { ISiteConfig, ConfigMap } from "@/lib/cms/configConstants";
 // ============================================
 
 const ConfigGroupSchema = z.enum(
-  ["appearance", "contact", "social", "footer", "meta", "general"],
+  ["appearance", "images", "meta", "contact", "social", "footer", "general"],
   {
     errorMap: () => ({ message: "Grupo no válido" }),
   },
