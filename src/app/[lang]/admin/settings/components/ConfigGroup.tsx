@@ -14,7 +14,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -26,6 +26,10 @@ import {
   Share2,
   FileText,
   Palette,
+  Image as ImageIcon,
+  Globe,
+  Upload,
+  Link as LinkIcon,
   LucideIcon,
 } from "lucide-react";
 import { upsertConfig } from "@/actions/cms/config";
@@ -43,6 +47,8 @@ const iconMap: Record<string, LucideIcon> = {
   share2: Share2,
   fileText: FileText,
   palette: Palette,
+  image: ImageIcon,
+  globe: Globe,
 };
 
 interface ConfigGroupProps {
@@ -59,6 +65,7 @@ interface ConfigItem {
   value: string;
   placeholder?: string;
   options?: Array<{ value: string; label: string }>;
+  isImage?: boolean; // Para habilitar upload en campos de imagen
 }
 
 interface SaveState {
@@ -142,6 +149,11 @@ export default function ConfigGroup({
   const [saveStates, setSaveStates] = useState<SaveState>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Estados para upload de imagenes
+  const [uploadingKeys, setUploadingKeys] = useState<Record<string, boolean>>({});
+  const [uploadErrors, setUploadErrors] = useState<Record<string, string>>({});
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
   const handleChange = (key: string, value: string, type: string) => {
     // DEBUG: Verificar que onChange se dispara (remover después de testing)
     console.log(`[ConfigGroup] handleChange: key=${key}, value=${value}, type=${type}`);
@@ -217,6 +229,68 @@ export default function ConfigGroup({
         return "+34 123 456 789";
       default:
         return `Ingresa ${label.toLowerCase()}`;
+    }
+  };
+
+  // Handle file selection para upload de imagenes
+  const handleFileSelect = async (key: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validar tipo de archivo
+    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml", "image/x-icon", "image/avif"];
+    if (!validTypes.includes(file.type)) {
+      setUploadErrors((prev) => ({ ...prev, [key]: "Formato no soportado. Usa PNG, JPG, GIF, WebP, SVG, ICO o AVIF" }));
+      return;
+    }
+
+    // Validar tamano (2MB max para icons/favicons, 5MB para resto)
+    const maxSize = key.includes("favicon") || key.includes("icon") ? 2 * 1024 * 1024 : 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setUploadErrors((prev) => ({
+        ...prev,
+        [key]: `Archivo muy grande. Max ${maxSize / 1024 / 1024}MB`
+      }));
+      return;
+    }
+
+    // Limpiar errores
+    setUploadErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[key];
+      return newErrors;
+    });
+
+    // Subir archivo
+    setUploadingKeys((prev) => ({ ...prev, [key]: true }));
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("bucket", "events");
+      formData.append("path", "settings");
+
+      const response = await fetch("/api/upload-images", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.status === "ok" && result.files?.[0]?.url) {
+        // Actualizar el valor con la URL subida
+        handleChange(key, result.files[0].url, "url");
+      } else {
+        setUploadErrors((prev) => ({ ...prev, [key]: result.message || "Error al subir imagen" }));
+      }
+    } catch (err) {
+      setUploadErrors((prev) => ({ ...prev, [key]: "Error de conexion al subir imagen" }));
+    } finally {
+      setUploadingKeys((prev) => ({ ...prev, [key]: false }));
+      // Limpiar input
+      if (fileInputRefs.current[key]) {
+        fileInputRefs.current[key]!.value = "";
+      }
     }
   };
 
@@ -318,6 +392,91 @@ export default function ConfigGroup({
                           </option>
                         ))}
                       </select>
+                    ) : config.isImage ? (
+                      // Input URL con opcion de upload para imagenes
+                      <div className="space-y-2">
+                        {/* Preview de imagen actual */}
+                        {values[config.key] && (
+                          <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-700 bg-[#0f1115]">
+                            <img
+                              src={values[config.key]}
+                              alt={config.label}
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = "none";
+                              }}
+                            />
+                          </div>
+                        )}
+
+                        {/* Input URL */}
+                        <div className="flex gap-2">
+                          <div className="flex-1 relative">
+                            <input
+                              type="url"
+                              value={values[config.key]}
+                              onChange={(e) =>
+                                handleChange(config.key, e.target.value, config.type)
+                              }
+                              placeholder={
+                                config.placeholder ||
+                                "https://ejemplo.com/imagen.png"
+                              }
+                              className={cn(
+                                "w-full bg-[#2a2d35] border rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors text-sm",
+                                error
+                                  ? "border-red-500 focus:ring-red-500/50"
+                                  : "border-gray-700 focus:ring-red-500/50 focus:border-red-500",
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Divider "o subir nueva" */}
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <div className="flex-1 border-t border-gray-700" />
+                          <span>o subir nueva</span>
+                          <div className="flex-1 border-t border-gray-700" />
+                        </div>
+
+                        {/* Upload button */}
+                        <div className="flex gap-2">
+                          <input
+                            ref={(el) => { fileInputRefs.current[config.key] = el; }}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleFileSelect(config.key, e)}
+                            className="hidden"
+                            id={`upload-${config.key}`}
+                          />
+                          <label
+                            htmlFor={`upload-${config.key}`}
+                            className={cn(
+                              "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg border cursor-pointer transition-all text-sm",
+                              uploadingKeys[config.key]
+                                ? "bg-blue-600/20 border-blue-600 text-blue-400"
+                                : "bg-[#2a2d35] border-gray-700 text-gray-300 hover:border-gray-600 hover:text-white"
+                            )}
+                          >
+                            {uploadingKeys[config.key] ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span>Subiendo...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="w-4 h-4" />
+                                <span>Seleccionar imagen</span>
+                              </>
+                            )}
+                          </label>
+                        </div>
+
+                        {/* Upload error */}
+                        {uploadErrors[config.key] && (
+                          <p className="text-red-500 text-xs">{uploadErrors[config.key]}</p>
+                        )}
+                      </div>
                     ) : (
                       // Input estandar (text, email, url, phone)
                       <>

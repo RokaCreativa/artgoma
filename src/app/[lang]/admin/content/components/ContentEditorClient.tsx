@@ -52,6 +52,10 @@ export default function ContentEditorClient({
   const [translatingLocale, setTranslatingLocale] = useState<string | null>(null);
   const [editorKey, setEditorKey] = useState(0); // Force re-mount of SectionEditor
 
+  // Translate All state
+  const [isTranslatingAll, setIsTranslatingAll] = useState(false);
+  const [translateAllProgress, setTranslateAllProgress] = useState<string | null>(null);
+
   const currentSection = sections.find((s) => s.key === selectedSection);
   const existingLocalesForSection = localExistingMap[selectedSection] || [];
 
@@ -133,6 +137,99 @@ export default function ContentEditorClient({
       setIsTranslating(false);
       setTranslatingLocale(null);
     }
+  }, [selectedSection, selectedLocale]);
+
+  // Translate All handler - translates to EN, DE, FR, IT, RU from ES
+  const handleTranslateAll = useCallback(async () => {
+    const targetLocales = ["en", "de", "fr", "it", "ru"];
+
+    // Confirm before translating
+    const confirmed = window.confirm(
+      `¿Traducir la seccion "${selectedSection}" a 5 idiomas?\n\n` +
+      `Idiomas: EN, DE, FR, IT, RU\n` +
+      `Costo estimado: ~$0.010\n\n` +
+      `Solo se traduciran los campos vacios. Los campos existentes se preservaran.`
+    );
+
+    if (!confirmed) return;
+
+    setIsTranslatingAll(true);
+    const results: { locale: string; success: boolean; fieldsTranslated?: number; error?: string }[] = [];
+
+    for (let i = 0; i < targetLocales.length; i++) {
+      const targetLocale = targetLocales[i];
+      setTranslateAllProgress(`${i + 1}/${targetLocales.length} - ${targetLocale.toUpperCase()}...`);
+
+      try {
+        const result = await autoTranslateSectionContent(
+          selectedSection,
+          "es",
+          targetLocale
+        );
+
+        if (result.success && result.data) {
+          results.push({
+            locale: targetLocale,
+            success: true,
+            fieldsTranslated: result.data.fieldsTranslated,
+          });
+
+          // Update existing map
+          setLocalExistingMap((prev) => {
+            const current = prev[selectedSection] || [];
+            if (!current.includes(targetLocale)) {
+              return {
+                ...prev,
+                [selectedSection]: [...current, targetLocale],
+              };
+            }
+            return prev;
+          });
+        } else {
+          results.push({
+            locale: targetLocale,
+            success: false,
+            error: result.error || "Error desconocido",
+          });
+        }
+      } catch (error) {
+        console.error(`Translate all error for ${targetLocale}:`, error);
+        results.push({
+          locale: targetLocale,
+          success: false,
+          error: "Error de conexion",
+        });
+      }
+    }
+
+    // Build summary
+    const successCount = results.filter((r) => r.success).length;
+    const failedResults = results.filter((r) => !r.success);
+    const totalFieldsTranslated = results
+      .filter((r) => r.success)
+      .reduce((sum, r) => sum + (r.fieldsTranslated || 0), 0);
+
+    if (failedResults.length === 0) {
+      toast({
+        title: "Traduccion completada",
+        description: `${successCount}/5 idiomas traducidos. ${totalFieldsTranslated} campos en total.`,
+      });
+    } else {
+      const failedLocales = failedResults.map((r) => r.locale.toUpperCase()).join(", ");
+      toast({
+        title: `${successCount}/5 idiomas traducidos`,
+        description: `Fallaron: ${failedLocales}. ${totalFieldsTranslated} campos traducidos.`,
+        variant: failedResults.length === targetLocales.length ? "destructive" : "default",
+      });
+    }
+
+    // Force reload editor if on a translated locale
+    if (targetLocales.includes(selectedLocale)) {
+      setEditorKey((prev) => prev + 1);
+    }
+
+    setIsTranslatingAll(false);
+    setTranslateAllProgress(null);
   }, [selectedSection, selectedLocale]);
 
   return (
@@ -275,6 +372,9 @@ export default function ContentEditorClient({
           onAutoTranslate={handleAutoTranslate}
           isTranslating={isTranslating}
           translatingLocale={translatingLocale}
+          onTranslateAll={handleTranslateAll}
+          isTranslatingAll={isTranslatingAll}
+          translateAllProgress={translateAllProgress}
         />
       </div>
 

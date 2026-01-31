@@ -29,6 +29,7 @@ interface SettingsPageProps {
 
 // Definicion de grupos con sus configs
 // FIX Next.js 16: Usar iconName string en vez de JSX para serialización Server->Client
+// REORGANIZADO 31/01/2026: Separado en grupos logicos (Apariencia, Imagenes, Meta Tags, etc)
 const CONFIG_GROUPS_DEFINITION: Array<{
   key: ConfigGroupType;
   title: string;
@@ -39,8 +40,10 @@ const CONFIG_GROUPS_DEFINITION: Array<{
     type: "text" | "url" | "email" | "phone" | "color" | "select";
     placeholder?: string;
     options?: Array<{ value: string; label: string }>;
+    isImage?: boolean; // Para habilitar upload en campos de imagen
   }>;
 }> = [
+  // GRUPO 1: APARIENCIA (Solo colores y fonts)
   {
     key: "appearance",
     title: "Apariencia",
@@ -88,39 +91,87 @@ const CONFIG_GROUPS_DEFINITION: Array<{
         type: "select",
         options: [...FONT_OPTIONS.body],
       },
-      {
-        key: "connect_image",
-        label: "Imagen Sección Conecte (banana)",
-        type: "url",
-        placeholder: "/banana.avif",
-      },
-      {
-        key: "connect_pattern",
-        label: "Pattern Fondo Conecte",
-        type: "url",
-        placeholder: "/paterngoma.png",
-      },
+    ],
+  },
+  // GRUPO 2: IMAGENES (Todas las imagenes con upload)
+  {
+    key: "images",
+    title: "Imagenes",
+    iconName: "image",
+    configs: [
       {
         key: "logo_url",
         label: "Logo del Sitio (navbar)",
         type: "url",
         placeholder: "/logo-artgoma.svg",
+        isImage: true,
       },
       {
         key: "favicon_url",
         label: "Favicon",
         type: "url",
         placeholder: "/favicon.ico",
+        isImage: true,
       },
       {
+        key: "connect_image",
+        label: "Imagen Seccion Conecte (banana)",
+        type: "url",
+        placeholder: "/banana.avif",
+        isImage: true,
+      },
+      {
+        key: "connect_pattern",
+        label: "Pattern Fondo Conecte",
+        type: "url",
+        placeholder: "/paterngoma.png",
+        isImage: true,
+      },
+      {
+        key: "explore_image",
+        label: "Imagen 'Explore' (seccion contacto)",
+        type: "url",
+        placeholder: "/explore.svg",
+        isImage: true,
+      },
+      {
+        key: "rotate_axis_icon",
+        label: "Icono 360 (hero)",
+        type: "url",
+        placeholder: "/rotate-axis.svg",
+        isImage: true,
+      },
+      {
+        key: "logo_horizontal",
+        label: "Logo Horizontal (GetInTouch)",
+        type: "url",
+        placeholder: "/Logo Goma horizontal.svg",
+        isImage: true,
+      },
+      {
+        key: "logo_vertical",
+        label: "Logo Vertical (GetInspired)",
+        type: "url",
+        placeholder: "/LogoGomaVertical.svg",
+        isImage: true,
+      },
+    ],
+  },
+  // GRUPO 3: META TAGS (SEO)
+  {
+    key: "meta",
+    title: "Meta Tags (SEO)",
+    iconName: "globe",
+    configs: [
+      {
         key: "site_title",
-        label: "Título del Sitio (meta)",
+        label: "Titulo del Sitio",
         type: "text",
         placeholder: "ArtGoMa",
       },
       {
         key: "site_description",
-        label: "Descripción del Sitio (meta)",
+        label: "Descripcion del Sitio",
         type: "text",
         placeholder: "Welcome to GoMa gallery!",
       },
@@ -129,39 +180,18 @@ const CONFIG_GROUPS_DEFINITION: Array<{
         label: "Imagen OpenGraph (compartir)",
         type: "url",
         placeholder: "/bg-black-logo-goma.png",
+        isImage: true,
       },
       {
         key: "apple_touch_icon",
         label: "Apple Touch Icon",
         type: "url",
         placeholder: "/apple-touch-icon.png",
-      },
-      {
-        key: "explore_image",
-        label: "Imagen 'Explore' (sección contacto)",
-        type: "url",
-        placeholder: "/explore.svg",
-      },
-      {
-        key: "rotate_axis_icon",
-        label: "Icono 360° (hero)",
-        type: "url",
-        placeholder: "/rotate-axis.svg",
-      },
-      {
-        key: "logo_horizontal",
-        label: "Logo Horizontal (GetInTouch)",
-        type: "url",
-        placeholder: "/Logo Goma horizontal.svg",
-      },
-      {
-        key: "logo_vertical",
-        label: "Logo Vertical (GetInspired)",
-        type: "url",
-        placeholder: "/LogoGomaVertical.svg",
+        isImage: true,
       },
     ],
   },
+  // GRUPO 4: CONTACTO
   {
     key: "contact",
     title: "Contacto",
@@ -199,6 +229,7 @@ const CONFIG_GROUPS_DEFINITION: Array<{
       },
     ],
   },
+  // GRUPO 5: REDES SOCIALES
   {
     key: "social",
     title: "Redes Sociales",
@@ -230,6 +261,7 @@ const CONFIG_GROUPS_DEFINITION: Array<{
       },
     ],
   },
+  // GRUPO 6: FOOTER
   {
     key: "footer",
     title: "Footer",

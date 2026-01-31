@@ -5,13 +5,15 @@
 
 /**
  * Grupos de configuración predefinidos
+ * ACTUALIZADO 31/01/2026: Separados en grupos logicos (appearance=colores/fonts, images=imagenes, meta=SEO)
  */
 export const CONFIG_GROUPS = {
-  appearance: "appearance", // bg_primary, bg_surface, bg_input, accent_color, font_display, font_body
-  contact: "contact", // phone, email, address, whatsapp
+  appearance: "appearance", // bg_primary, bg_surface, bg_input, accent_color, bg_footer, font_display, font_body
+  images: "images", // logo_url, favicon_url, connect_image, connect_pattern, explore_image, rotate_axis_icon, logo_horizontal, logo_vertical
+  meta: "meta", // site_title, site_description, og_image, apple_touch_icon
+  contact: "contact", // phone, email, address, whatsapp, maps_link
   social: "social", // facebook, instagram, youtube, twitter, linkedin, tiktok
-  footer: "footer", // copyright, year
-  meta: "meta", // siteName, siteUrl, description
+  footer: "footer", // copyright, year, website
   general: "general", // otros
 } as const;
 

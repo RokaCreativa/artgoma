@@ -8,7 +8,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Check, AlertCircle, Sparkles, Loader2 } from "lucide-react";
+import { Check, AlertCircle, Sparkles, Loader2, Globe } from "lucide-react";
 import { LOCALE_LABELS } from "@/lib/cms/sectionSchemas";
 
 interface LocaleTabsProps {
@@ -21,6 +21,10 @@ interface LocaleTabsProps {
   onAutoTranslate?: (targetLocale: string) => void;
   isTranslating?: boolean;
   translatingLocale?: string | null;
+  // Translate all props
+  onTranslateAll?: () => void;
+  isTranslatingAll?: boolean;
+  translateAllProgress?: string | null;
 }
 
 export default function LocaleTabs({
@@ -32,12 +36,18 @@ export default function LocaleTabs({
   onAutoTranslate,
   isTranslating = false,
   translatingLocale = null,
+  onTranslateAll,
+  isTranslatingAll = false,
+  translateAllProgress = null,
 }: LocaleTabsProps) {
   // Check if Spanish (source) has content for auto-translate to work
   const spanishHasContent = existingLocales.includes("es");
 
+  // Show "Translate All" button only when on ES tab and ES has content
+  const showTranslateAllButton = activeLocale === "es" && spanishHasContent && onTranslateAll;
+
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 items-center">
       {locales.map((locale) => {
         const isActive = locale === activeLocale;
         const hasContent = existingLocales.includes(locale);
@@ -120,6 +130,33 @@ export default function LocaleTabs({
           </div>
         );
       })}
+
+      {/* Translate All button - Only visible on ES tab */}
+      {showTranslateAllButton && (
+        <button
+          onClick={onTranslateAll}
+          disabled={disabled || isTranslating || isTranslatingAll}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ml-2",
+            "bg-gradient-to-r from-purple-600 to-indigo-600 border border-purple-500/50 text-white",
+            "hover:from-purple-500 hover:to-indigo-500 hover:border-purple-400/50",
+            "shadow-lg shadow-purple-500/20",
+            (disabled || isTranslating || isTranslatingAll) && "opacity-50 cursor-not-allowed"
+          )}
+        >
+          {isTranslatingAll ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>{translateAllProgress || "Traduciendo..."}</span>
+            </>
+          ) : (
+            <>
+              <Globe className="w-4 h-4" />
+              <span>Traducir a todos los idiomas</span>
+            </>
+          )}
+        </button>
+      )}
     </div>
   );
 }

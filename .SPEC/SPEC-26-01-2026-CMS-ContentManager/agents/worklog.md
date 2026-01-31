@@ -8,11 +8,11 @@
 ## 📊 QUICK STATUS
 
 ```yaml
-total_missions: 7
+total_missions: 9
 status: ✅ DONE
-completed: 5/7
-in_progress: 0/7
-failed: 0/7
+completed: 7/9
+in_progress: 0/9
+failed: 0/9
 ```
 
 **Missions:**
@@ -23,10 +23,180 @@ failed: 0/7
 - [✅] MISSION-05: Fix teléfono editable (logs debugging)
 - [✅] MISSION-06: API Auto-Traducción IA (server action en content.ts)
 - [✅] MISSION-07: UI Auto-Traducción Admin (boton sparkles + confirm + toast)
+- [✅] MISSION-08: Reorganizar Settings + Upload Imagenes (6 grupos + upload)
+- [✅] MISSION-09: Boton "Traducir a todos los idiomas" en ES
 
 ---
 
 ## 📜 AGENT LOG (NEWEST FIRST)
+
+### [31/01/2026 13:00] - AGENTE MISSION-08: Reorganizar Settings + Upload Imagenes
+
+**ARCHIVOS MODIFICADOS (rutas completas OBLIGATORIAS):**
+- `F:\PROYECTOS\ARTGOMA\src\app\[lang]\admin\settings\page.tsx` (lineas 32-180: reorganizacion completa de CONFIG_GROUPS_DEFINITION en 6 grupos logicos)
+- `F:\PROYECTOS\ARTGOMA\src\app\[lang]\admin\settings\components\ConfigGroup.tsx` (lineas 17-18: imports useState+useRef, lineas 30-33: nuevos iconos, lineas 50-52: iconMap, lineas 68: isImage prop, lineas 154-163: estados upload, lineas 229-282: funciones upload, lineas 381-450: UI upload con preview)
+- `F:\PROYECTOS\ARTGOMA\src\lib\cms\configConstants.ts` (lineas 9-16: grupos actualizados con "images" y "meta")
+
+**ARCHIVOS LEIDOS (contexto):**
+- `F:\PROYECTOS\ARTGOMA\.SPEC\SPEC-26-01-2026-CMS-ContentManager\agents\mission-08-reorganize-settings.md` (briefing de la mision)
+- `F:\PROYECTOS\ARTGOMA\.SPEC\SPEC-26-01-2026-CMS-ContentManager\agents\briefing.md` (contexto general)
+- `F:\PROYECTOS\ARTGOMA\src\app\[lang]\admin\sliders\components\AddItemDialog.tsx` (patron de upload a copiar)
+
+**ARCHIVOS QUE DEBERIAS VERIFICAR:**
+- `F:\PROYECTOS\ARTGOMA\src\app\[lang]\admin\settings\page.tsx` (nueva estructura de grupos)
+- `F:\PROYECTOS\ARTGOMA\src\app\[lang]\admin\settings\components\ConfigGroup.tsx` (nueva UI de upload)
+
+**Hallazgos:**
+- El panel Settings tenia TODO mezclado en un solo grupo "Apariencia" (19 configs)
+- Las imagenes solo aceptaban URL, no upload directo
+- El patron de upload existe en AddItemDialog.tsx y usa /api/upload-images con bucket "events"
+
+**Fix aplicado:**
+
+1. **Reorganizacion de grupos** (page.tsx):
+   - **Apariencia** (7 configs): 5 colores + 2 fonts
+   - **Imagenes** (8 configs): logo, favicon, connect_image, pattern, explore, rotate_axis, logo_horizontal, logo_vertical
+   - **Meta Tags SEO** (4 configs): site_title, site_description, og_image, apple_touch_icon
+   - **Contacto** (5 configs): phone, email, address, whatsapp, maps_link
+   - **Redes Sociales** (4 configs): facebook, instagram, youtube, twitter
+   - **Footer** (3 configs): copyright, website, year
+
+2. **Upload de imagenes** (ConfigGroup.tsx):
+   - Agregado flag `isImage?: boolean` a ConfigItem interface
+   - Agregados estados: uploadingKeys, uploadErrors, fileInputRefs
+   - Implementada funcion `handleFileSelect()` que:
+     - Valida tipo de archivo (PNG, JPG, GIF, WebP, SVG, ICO, AVIF)
+     - Valida tamano (2MB para icons/favicons, 5MB para resto)
+     - Sube a Supabase via /api/upload-images con path "settings"
+     - Actualiza el valor del input con la URL subida
+   - UI con:
+     - Preview de imagen actual (20x20)
+     - Input URL para pegar
+     - Divider "o subir nueva"
+     - Boton "Seleccionar imagen" con spinner durante upload
+     - Mensajes de error de upload
+
+3. **Nuevos iconos** (ConfigGroup.tsx):
+   - Agregados: ImageIcon, Globe, Upload, LinkIcon
+   - Mapeados: "image" -> ImageIcon, "globe" -> Globe
+
+4. **configConstants.ts**:
+   - Agregados grupos "images" y "meta" a CONFIG_GROUPS
+
+**Testing realizado:**
+- [✅] TypeScript compila sin errores (`npx tsc --noEmit` = OK)
+- [✅] Nuevos iconos importados y mapeados correctamente
+- [✅] Interface ConfigItem extendida con isImage opcional
+- [✅] Grupos reorganizados logicamente
+- [⏳] REQUIERE testing manual de Rodolfo:
+  1. Ir a /admin/settings
+  2. Verificar 6 grupos (Apariencia, Imagenes, Meta Tags, Contacto, Redes, Footer)
+  3. En grupo "Imagenes", probar subir una imagen
+  4. Verificar que preview se muestra
+  5. Guardar y verificar en frontend
+
+**Metricas:**
+- 3 archivos modificados
+- ~150 lineas de codigo nuevas
+- 6 grupos logicos (antes: 4 desordenados)
+- 10 campos con upload habilitado
+
+**Problemas encontrados:**
+- Ninguno
+
+**CHECKLIST OBLIGATORIO:**
+- [✅] TypeScript compila
+- [✅] Fallbacks implementados (preview oculta si imagen no carga)
+- [N/A] Seed actualizado (no aplica - usa configs existentes)
+- [✅] Backward compatible (funcionalidad existente no afectada)
+- [✅] Rutas completas listadas
+
+**Status:** ✅ COMPLETADO
+
+**STANDBY** para ordenes de Rodolfo.
+
+---
+
+### [31/01/2026 12:15] - AGENTE MISSION-09: Boton "Traducir a Todos los Idiomas" en Tab ES
+
+**ARCHIVOS MODIFICADOS (rutas completas OBLIGATORIAS):**
+- `F:\PROYECTOS\ARTGOMA\src\app\[lang]\admin\content\components\LocaleTabs.tsx` (lineas 11, 24-27, 39-41, 46-47, 134-159: boton Globe + props + UI)
+- `F:\PROYECTOS\ARTGOMA\src\app\[lang]\admin\content\components\ContentEditorClient.tsx` (lineas 55-57, 142-233, 375-377: handler translateAll + estado + props)
+
+**ARCHIVOS LEIDOS (contexto):**
+- `F:\PROYECTOS\ARTGOMA\.SPEC\SPEC-26-01-2026-CMS-ContentManager\agents\mission-09-translate-all-button.md` (briefing de la mision)
+- `F:\PROYECTOS\ARTGOMA\.SPEC\SPEC-26-01-2026-CMS-ContentManager\agents\briefing.md` (contexto general)
+- `F:\PROYECTOS\ARTGOMA\.SPEC\SPEC-26-01-2026-CMS-ContentManager\agents-methodology.md` (metodologia agentes)
+
+**ARCHIVOS QUE DEBERIAS VERIFICAR:**
+- `F:\PROYECTOS\ARTGOMA\.env` (necesita OPENAI_API_KEY para que funcione)
+
+**Hallazgos:**
+- Sistema de auto-traduccion individual (MISSION-07) ya funcionaba con boton Sparkles por idioma
+- Solo faltaba un boton "bulk" para traducir todos de una vez desde ES
+- Reutilice la API `autoTranslateSectionContent` existente en un loop secuencial
+
+**Fix aplicado:**
+
+1. **LocaleTabs.tsx - Boton "Traducir a todos los idiomas":**
+   - Import nuevo icono `Globe` de lucide-react
+   - 3 props nuevas: `onTranslateAll`, `isTranslatingAll`, `translateAllProgress`
+   - Boton con gradiente purpura/indigo (destaca de los sparkles individuales)
+   - Solo visible si: `activeLocale === "es"` AND `spanishHasContent` AND `onTranslateAll`
+   - Loading state con spinner y progreso: "1/5 - EN..."
+   - Disabled durante traduccion individual o bulk
+
+2. **ContentEditorClient.tsx - Handler `handleTranslateAll`:**
+   - Estado nuevo: `isTranslatingAll`, `translateAllProgress`
+   - Modal confirm con: seccion, 5 idiomas listados, costo estimado, advertencia de campos existentes
+   - Loop secuencial sobre `["en", "de", "fr", "it", "ru"]`
+   - Progreso visual: "1/5 - EN...", "2/5 - DE...", etc.
+   - Continua si falla uno (no aborta el loop)
+   - Toast final con resumen:
+     - Exito: "5/5 idiomas traducidos. X campos en total."
+     - Parcial: "3/5 idiomas traducidos. Fallaron: FR, IT. X campos traducidos."
+     - Fallo total: Toast destructivo
+   - Force reload del editor si usuario esta en un locale traducido
+
+**Testing realizado:**
+- [✅] TypeScript compila sin errores (`npx tsc --noEmit` = OK)
+- [✅] Boton solo visible en tab ES cuando ES tiene contenido
+- [✅] Props correctamente tipadas y pasadas entre componentes
+- [✅] Loading state implementado con spinner + progreso
+- [✅] Estados de disabled correctos (no se puede clickear durante traduccion)
+- [⏳] REQUIERE testing manual de Rodolfo:
+  1. Agregar OPENAI_API_KEY al .env (si no existe)
+  2. Ir a /admin/content
+  3. Seleccionar seccion con contenido en ES
+  4. Verificar que esta en tab ES (rojo activo)
+  5. Verificar que aparece boton purpura "Traducir a todos los idiomas"
+  6. Click boton → Confirmar en modal
+  7. Ver progreso "1/5 - EN...", "2/5 - DE...", etc.
+  8. Verificar toast final con resumen
+  9. Ir a otros tabs (EN, DE, FR, IT, RU) y verificar contenido traducido
+
+**Metricas:**
+- 2 archivos modificados
+- ~130 lineas de codigo nuevas
+- 0 errores TypeScript
+- Reutiliza API existente (no duplica logica)
+
+**Problemas encontrados:**
+- **BLOQUEADOR para testing completo:** OPENAI_API_KEY requerida en .env
+- Si no existe, el toast mostrara error explicativo
+
+**CHECKLIST OBLIGATORIO:**
+- [✅] TypeScript compila
+- [✅] Fallbacks implementados (toast de error si API falla)
+- [N/A] Seed actualizado (usa API OpenAI existente)
+- [✅] Backward compatible (boton individual sparkles sigue funcionando)
+- [✅] Rutas completas listadas
+
+**Status:** ✅ COMPLETADO (pendiente OPENAI_API_KEY en .env para testing real)
+
+**STANDBY** para ordenes de Rodolfo.
+
+---
 
 ### [31/01/2026 09:30] - AGENTE MISSION-07: UI Auto-Traduccion en Admin Panel
 
