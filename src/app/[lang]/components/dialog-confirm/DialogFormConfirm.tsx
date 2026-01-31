@@ -21,9 +21,9 @@ const DialogFormConfirm = async ({ lang, eventId, ui }: DialogFormConfirmProps) 
       <DialogTrigger className={cn(buttonVariants({ variant: "default" }))}>
         {ui?.dialog?.withoutAuth ?? "Without Authentication"}
       </DialogTrigger>
-      <DialogContent className="shadow-red-600/50 shadow-xl max-h-screen overflow-hidden overflow-y-scroll">
+      <DialogContent className="bg-[#1c1f24] border-gray-800 text-white shadow-red-600/50 shadow-xl max-h-screen overflow-hidden overflow-y-scroll">
         <DialogHeader>
-          <DialogTitle className="text-center">
+          <DialogTitle className="text-center text-white">
             {ui?.dialog?.withoutAuthTitle ?? "Confirm without authentication?"}
           </DialogTitle>
         </DialogHeader>

@@ -14,9 +14,9 @@ const DialogConfirm = async ({ lang }: { lang: Locale }) => {
   return (
     <Dialog>
       <DialogTriggerWrapper text={home.button} />
-      <DialogContent className="shadow-red-600/50 shadow-xl">
+      <DialogContent className="bg-[#1c1f24] border-gray-800 text-white shadow-red-600/50 shadow-xl">
         <DialogHeader>
-          <DialogTitle className="mb-4 text-center">
+          <DialogTitle className="mb-4 text-center text-white">
             {ui?.dialog?.confirmTitle ?? "How would you like to confirm?"}
           </DialogTitle>
         </DialogHeader>
@@ -24,7 +24,7 @@ const DialogConfirm = async ({ lang }: { lang: Locale }) => {
           <Link className={cn(buttonVariants({ variant: "default" }))} href={`/${lang}/confirm`}>
             {ui?.dialog?.withAuth ?? "With Authentication"}
           </Link>
-          <span className="font-semibold">{ui?.dialog?.or ?? "or"}</span>
+          <span className="font-semibold text-white">{ui?.dialog?.or ?? "or"}</span>
           <DialogFormConfirm lang={lang} ui={ui} />
         </div>
       </DialogContent>
