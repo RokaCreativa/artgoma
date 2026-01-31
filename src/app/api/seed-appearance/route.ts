@@ -15,6 +15,10 @@ const APPEARANCE_CONFIGS = [
   { key: "font_body", value: "Montserrat", type: "select", group: "appearance", label: "Fuente Textos" },
   { key: "connect_image", value: "/banana.avif", type: "url", group: "appearance", label: "Imagen Sección Conecte" },
   { key: "connect_pattern", value: "/paterngoma.png", type: "url", group: "appearance", label: "Pattern Fondo Conecte" },
+  { key: "logo_url", value: "/logo-artgoma.svg", type: "url", group: "appearance", label: "Logo del Sitio" },
+  { key: "favicon_url", value: "/favicon.ico", type: "url", group: "appearance", label: "Favicon" },
+  { key: "site_title", value: "ArtGoMA", type: "text", group: "appearance", label: "Título del Sitio" },
+  { key: "site_description", value: "Welcome to GoMa gallery! UNIQUE ART EXPERIENCE IN TENERIFE", type: "text", group: "appearance", label: "Descripción del Sitio" },
 ];
 
 export async function GET() {

@@ -8,15 +8,20 @@ import Image from "next/image";
 import { Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
+import { getConfigByKey } from "@/actions/cms/config";
 
 const Navbar = async ({ lang }: { lang: Locale }) => {
   const { navbar } = await getDictionary(lang);
   const session = await getServerSession(authOptions);
 
+  // Cargar logo configurable desde BD
+  const logoConfig = await getConfigByKey("logo_url");
+  const logoSrc = logoConfig?.data?.value || "/logo-artgoma.svg";
+
   return (
     <nav className="flex justify-around w-full fixed z-[200] top-4">
       <Link href={`/${lang}`} className="bg-black/50 backdrop-blur-md px-2 rounded-2xl">
-        <Image className="h-12 w-12 md:h-10 md:w-10 " src="/logo-artgoma.svg" alt="logo goma" width={80} height={80} />
+        <Image className="h-12 w-12 md:h-10 md:w-10 " src={logoSrc} alt="logo goma" width={80} height={80} />
       </Link>
 
       <div className="flex gap-6 items-center">

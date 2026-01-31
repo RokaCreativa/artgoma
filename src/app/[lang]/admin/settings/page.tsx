@@ -100,6 +100,30 @@ const CONFIG_GROUPS_DEFINITION: Array<{
         type: "url",
         placeholder: "/paterngoma.png",
       },
+      {
+        key: "logo_url",
+        label: "Logo del Sitio (navbar)",
+        type: "url",
+        placeholder: "/logo-artgoma.svg",
+      },
+      {
+        key: "favicon_url",
+        label: "Favicon",
+        type: "url",
+        placeholder: "/favicon.ico",
+      },
+      {
+        key: "site_title",
+        label: "Título del Sitio (meta)",
+        type: "text",
+        placeholder: "ArtGoMa",
+      },
+      {
+        key: "site_description",
+        label: "Descripción del Sitio (meta)",
+        type: "text",
+        placeholder: "Welcome to GoMa gallery!",
+      },
     ],
   },
   {

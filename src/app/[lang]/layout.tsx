@@ -20,6 +20,7 @@ import {
   generateAppearanceCSS,
   generateGoogleFontsURL,
 } from "@/lib/cms/appearanceUtils";
+import { getConfigByKey } from "@/actions/cms/config";
 
 // Font Display (titulos H1/H2) - elegancia artistica, estilo galeria de arte
 const cormorant = Cormorant_Garamond({
@@ -35,34 +36,47 @@ const montserrat = Montserrat({
   variable: "--font-sans",
 });
 
-export const metadata: Metadata = {
-  title: "ArtGoMA",
-  description: "Welcome to GoMa gallery! UNIQUE ART EXPERIENCE IN TENERIFE",
-  keywords: ["Art Goma", "GoMA", "Arte en Tenerife", "Galería GoMA"],
-  authors: [{ name: "Karen" }],
-  creator: "Karen",
-  openGraph: {
-    title: "ArtGoMa",
-    description: "Welcome to GoMA gallery! UNIQUE ART EXPERIENCE IN TENERIFE",
-    url: "https://artgoma.vercel.app",
-    siteName: "ArtGoMA",
-    images: [
-      {
-        url: "https://artgoma.vercel.app/bg-black-logo-goma.png",
-        width: 600,
-        height: 600,
-        alt: "ArtGoMA",
-      },
-    ],
-    type: "website",
-    locale: "es",
-  },
-  icons: {
-    icon: ["/favicon.ico"],
-    apple: ["/apple-touch-icon.png"],
-    shortcut: ["/apple-touch-icon.png"],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  // Cargar configs de meta desde BD
+  const [siteTitle, siteDesc, faviconUrl] = await Promise.all([
+    getConfigByKey("site_title"),
+    getConfigByKey("site_description"),
+    getConfigByKey("favicon_url"),
+  ]);
+
+  const title = siteTitle?.data?.value || "ArtGoMA";
+  const description = siteDesc?.data?.value || "Welcome to GoMa gallery! UNIQUE ART EXPERIENCE IN TENERIFE";
+  const favicon = faviconUrl?.data?.value || "/favicon.ico";
+
+  return {
+    title,
+    description,
+    keywords: ["Art Goma", "GoMA", "Arte en Tenerife", "Galería GoMA"],
+    authors: [{ name: "Karen" }],
+    creator: "Karen",
+    openGraph: {
+      title,
+      description,
+      url: "https://artgoma.vercel.app",
+      siteName: title,
+      images: [
+        {
+          url: "https://artgoma.vercel.app/bg-black-logo-goma.png",
+          width: 600,
+          height: 600,
+          alt: title,
+        },
+      ],
+      type: "website",
+      locale: "es",
+    },
+    icons: {
+      icon: [favicon],
+      apple: ["/apple-touch-icon.png"],
+      shortcut: ["/apple-touch-icon.png"],
+    },
+  };
+}
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }));
